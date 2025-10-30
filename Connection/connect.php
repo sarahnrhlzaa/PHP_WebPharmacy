@@ -5,6 +5,8 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'webpharmacy');
 
+// ini aku mau nyoba aja dulu
+
 // Create default connection (untuk backward compatibility)
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
