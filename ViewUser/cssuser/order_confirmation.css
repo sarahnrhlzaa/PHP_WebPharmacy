@@ -1,0 +1,332 @@
+/* Order Confirmation Page Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Andika', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.confirmation-container {
+    max-width: 800px;
+    margin: 80px auto 40px;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Success Icon */
+.success-icon {
+    margin-bottom: 20px;
+}
+
+.success-icon i {
+    font-size: 80px;
+    color: #27ae60;
+    animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.confirmation-container h1 {
+    font-size: 32px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.success-message {
+    font-size: 16px;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+/* Order Info Box */
+.order-info-box {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+.order-info-box h3 {
+    font-size: 20px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row .label {
+    font-weight: bold;
+    color: #7f8c8d;
+}
+
+.info-row .value {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.info-row .value.status-pending {
+    color: #f39c12;
+}
+
+.info-row .value.status-paid {
+    color: #27ae60;
+}
+
+.info-row .value.status-processing {
+    color: #3498db;
+}
+
+.info-row .value.status-shipped {
+    color: #9b59b6;
+}
+
+.info-row .value.status-delivered {
+    color: #27ae60;
+}
+
+/* Details Section */
+.details-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+.details-section h3 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.details-section h3 i {
+    color: #3498db;
+}
+
+.details-section p {
+    margin-bottom: 8px;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Order Items Section */
+.order-items-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.order-items-section h3 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+
+.order-items-section h3 i {
+    color: #3498db;
+}
+
+/* Items Table */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.items-table thead {
+    background: #f8f9fa;
+}
+
+.items-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+    color: #2c3e50;
+    border-bottom: 2px solid #ddd;
+}
+
+.items-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.items-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+.items-table tfoot td {
+    padding: 12px;
+    font-size: 16px;
+}
+
+.items-table tfoot .total-row td {
+    font-weight: bold;
+    font-size: 18px;
+    color: #2c3e50;
+    border-top: 2px solid #ddd;
+}
+
+/* Payment Instructions */
+.payment-instructions {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.payment-instructions h3 {
+    font-size: 18px;
+    color: #856404;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-instructions h3 i {
+    color: #ffc107;
+}
+
+.payment-instructions p {
+    margin-bottom: 15px;
+    color: #856404;
+}
+
+.bank-accounts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.bank-account {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ffc107;
+}
+
+.bank-account strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.note {
+    font-style: italic;
+    color: #856404;
+    margin-top: 15px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 15px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+}
+
+.btn-secondary {
+    background: white;
+    color: #3498db;
+    border: 2px solid #3498db;
+}
+
+.btn-secondary:hover {
+    background: #3498db;
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .confirmation-container {
+        padding: 10px;
+    }
+    
+    .success-icon i {
+        font-size: 60px;
+    }
+    
+    .confirmation-container h1 {
+        font-size: 24px;
+    }
+    
+    .items-table {
+        font-size: 14px;
+    }
+    
+    .items-table th,
+    .items-table td {
+        padding: 8px;
+    }
+    
+    .bank-accounts {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

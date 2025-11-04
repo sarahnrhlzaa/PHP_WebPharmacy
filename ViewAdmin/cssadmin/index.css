@@ -1,0 +1,363 @@
+/* ==================== CSSADMIN/HOME.CSS ==================== */
+
+/* ========== MAIN CONTENT ========== */
+.main-content {
+    margin-left: 256px;
+    margin-top: 64px;
+    padding: 24px;
+    min-height: calc(100vh - 64px);
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.full-width {
+    margin-left: 0;
+}
+
+/* ========== SLIDER ========== */
+.slider-container {
+    position: relative;
+    height: 256px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+.slide-content {
+    text-align: center;
+    color: white;
+    padding: 20px;
+}
+
+.slide-content h3 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.slide-content p {
+    font-size: 20px;
+}
+
+.slider-dots {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.dot.active {
+    background-color: white;
+}
+
+/* ========== STATS GRID ========== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background-color: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-label {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.stat-card.red .stat-value {
+    color: #dc2626;
+}
+
+.stat-card.blue .stat-value {
+    color: #3b82f6;
+}
+
+.stat-card.green .stat-value {
+    color: #10b981;
+}
+
+.stat-card.purple .stat-value {
+    color: #8b5cf6;
+}
+
+.stat-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon.red-bg {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.stat-icon.blue-bg {
+    background-color: #dbeafe;
+    color: #3b82f6;
+}
+
+.stat-icon.green-bg {
+    background-color: #d1fae5;
+    color: #10b981;
+}
+
+.stat-icon.purple-bg {
+    background-color: #ede9fe;
+    color: #8b5cf6;
+}
+
+/* ========== CARD ========== */
+.card {
+    background-color: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.card-header h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.card-header svg {
+    color: #3b82f6;
+}
+
+/* ========== STOCK ALERTS ========== */
+.alert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+}
+
+.alert-info {
+    flex: 1;
+}
+
+.alert-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.alert-min {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.alert-status {
+    text-align: right;
+}
+
+.alert-stock {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.alert-stock.low {
+    color: #f59e0b;
+}
+
+.alert-stock.critical {
+    color: #dc2626;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge.low {
+    background-color: #fef3c7;
+    color: #f59e0b;
+}
+
+.badge.critical {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* ========== CHART ========== */
+#transactionChart {
+    width: 100%;
+    height: 300px;
+}
+
+/* ========== TABLE ========== */
+.table-container {
+    overflow-x: auto;
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transaction-table thead {
+    background-color: #f9fafb;
+}
+
+.transaction-table th {
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.transaction-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.transaction-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.td-bold {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.td-gray {
+    color: #6b7280;
+}
+
+.badge-type {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.badge-type.in {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+.badge-type.out {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 16px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .slide-content h3 {
+        font-size: 24px;
+    }
+    
+    .slide-content p {
+        font-size: 16px;
+    }
+    
+    .alert-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .alert-status {
+        text-align: left;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .transaction-table {
+        font-size: 14px;
+    }
+    
+    .transaction-table th,
+    .transaction-table td {
+        padding: 8px;
+    }
+}

@@ -1,0 +1,373 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Andika', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+.history-container {
+    max-width: 1200px;
+    margin: 80px auto 50px;
+    padding: 0 20px;
+}
+
+/* Page Header */
+.page-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-size: 36px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.page-header h1 i {
+    color: #667eea;
+}
+
+.page-header p {
+    font-size: 16px;
+    color: #7f8c8d;
+}
+
+/* Empty State */
+.empty-state {
+    background: white;
+    border-radius: 15px;
+    padding: 60px 30px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state i {
+    font-size: 80px;
+    color: #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.empty-state h2 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    font-size: 16px;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+.btn-shop {
+    display: inline-block;
+    padding: 14px 35px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-shop:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-shop i {
+    margin-right: 8px;
+}
+
+/* Orders List */
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.order-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Order Header */
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.order-info h3 {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.order-date {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.order-date i {
+    margin-right: 5px;
+}
+
+.order-badges {
+    display: flex;
+    gap: 10px;
+}
+
+.badge {
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-processing {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.badge-confirmed {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.badge-shipped {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-delivered {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Order Body */
+.order-body {
+    padding: 25px;
+}
+
+.order-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: #2c3e50;
+}
+
+.detail-item i {
+    color: #667eea;
+    font-size: 18px;
+}
+
+.detail-item.total {
+    font-size: 20px;
+}
+
+.detail-item.total strong {
+    color: #4caf50;
+}
+
+/* Order Actions */
+.order-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-view,
+.btn-pay {
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-view {
+    background: #f8f9fa;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-view:hover {
+    background: #667eea;
+    color: white;
+}
+
+.btn-pay {
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    color: white;
+    border: none;
+}
+
+.btn-pay:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+/* Progress Tracker */
+.order-progress {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 25px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 20px;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    position: relative;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.progress-step.active .step-icon {
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+}
+
+.progress-step span {
+    font-size: 12px;
+    color: #7f8c8d;
+    font-weight: 600;
+    text-align: center;
+}
+
+.progress-step.active span {
+    color: #2c3e50;
+}
+
+.progress-line {
+    flex: 1;
+    height: 3px;
+    background: #e0e0e0;
+    margin: 0 -10px;
+    margin-top: -20px;
+    position: relative;
+    z-index: 1;
+}
+
+.progress-line.active {
+    background: linear-gradient(90deg, #4caf50, #66bb6a);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .history-container {
+        margin-top: 60px;
+        padding: 0 15px;
+    }
+    
+    .page-header h1 {
+        font-size: 28px;
+    }
+    
+    .order-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .order-info h3 {
+        font-size: 18px;
+    }
+    
+    .order-details {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .order-actions {
+        width: 100%;
+    }
+    
+    .btn-view,
+    .btn-pay {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .order-progress {
+        padding: 20px 10px;
+        overflow-x: auto;
+    }
+    
+    .progress-step span {
+        font-size: 10px;
+    }
+    
+    .step-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+}
