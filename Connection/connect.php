@@ -1,33 +1,36 @@
-<!-- <?php
-// Database configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'webpharmacy');
+<?php
+// File: /Connection/connect.php
 
-// Create default connection (untuk backward compatibility)
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Function to get new connection
 function getConnection() {
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    
+    /**
+     * 'mysql' adalah nama service database-mu di docker-compose.yml
+     */
+    $servername = getenv('DB_HOST') ?: 'mysql';
+
+    // Kredensial ini diambil dari environment service 'mysql'
+    $username = getenv('DB_USER') ?: 'appuser'; 
+    $password = getenv('DB_PASSWORD') ?: 'password';
+    $dbname = getenv('DB_NAME') ?: 'webpharmacy';
+
+    // Buat koneksi baru
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    // Cek koneksi
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
-    
+
+    // Kembalikan (return) objek koneksi
     return $conn;
 }
 
-// Function to close connection
+/**
+ * Fungsi ini dipanggil oleh medicine.php
+ */
 function closeConnection($conn) {
     if ($conn) {
         $conn->close();
     }
 }
-?> -->
+
+
