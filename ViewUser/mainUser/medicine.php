@@ -49,30 +49,27 @@ function formatPrice($price) {
     return 'Rp ' . number_format($price, 0, ',', '.');
 }
 
-// Function to get correct image path - FIXED to prevent infinite reload
+// Function to get correct image path - FIXED
 function getImagePath($image_path) {
-    // If path is empty or null, return default
+    
+    // 1. Tentukan path default yang benar (mundur 2 kali)
+    $default_image = '../../assets/default.jpg';
+
+    // 2. Jika path dari DB kosong, pakai default
     if (empty($image_path)) {
-        return '../assets/default.jpg';
+        return $default_image;
     }
-    
-    // If path already starts with ../, return as is
-    if (strpos($image_path, '../') === 0) {
-        return $image_path;
+
+    // 3. Jika di DB sudah ada path (misal: 'assets/gambar.jpg')
+    if (strpos($image_path, '/') !== false) {
+         // Hapus '/' di awal jika ada, lalu gabung
+         return '../../' . ltrim($image_path, '/');
     }
-    
-    // If path starts with ../../, fix it to ../
-    if (strpos($image_path, '../../') === 0) {
-        return str_replace('../../', '../', $image_path);
-    }
-    
-    // If only filename, add ../assets/ prefix
-    if (strpos($image_path, '/') === false) {
-        return '../assets/' . $image_path;
-    }
-    
-    // Otherwise return as is
-    return $image_path;
+
+    // 4. Jika di DB hanya NAMA FILE (e.g., 'sanmol.jpg')
+    //    Ini adalah kasus yang paling mungkin.
+    //    Bangun path relatif yang benar.
+    return '../../assets/' . $image_path;
 }
 ?>
 <!DOCTYPE html>
@@ -184,7 +181,7 @@ function getImagePath($image_path) {
             <div class="detail-box">
                 <div class="type">
                     <a href="#"><?php echo htmlspecialchars($product['medicine_name']); ?></a>
-                    <span><?php echo htmlspecialchars($product['tag']); ?></span>
+                    <span><?php echo htmlspecialchars($product['tag'] ?? ''); ?></span>
                 </div>
                 <a href="#" class="price"><?php echo formatPrice($product['price']); ?></a>
             </div>

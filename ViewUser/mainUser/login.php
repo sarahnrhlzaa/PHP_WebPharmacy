@@ -12,6 +12,8 @@ if (file_exists(__DIR__ . '/../connection/connect.php')) {
     die("Error: File connect.php tidak ditemukan!");
 }
 
+$conn = getConnection();
+
 if (!empty($_SESSION['user_id'])) {
     $next = $_GET['next'] ?? 'index.php';
     header('Location: ' . $next);
