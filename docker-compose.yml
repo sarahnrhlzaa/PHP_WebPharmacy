@@ -1,18 +1,31 @@
-version: '3.8'
+# Baris 'version' sudah usang, jadi kita hapus
 services:
-  # PHP dengan Apache Web Server
+  # 1. Service Nginx (BARU - Pengganti Apache)
+  # Ini adalah "resepsionis" web server-mu
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80" # Kita tetap pakai port 8080-mu
+    volumes:
+      - .:/var/www/html # Menyambungkan folder kodemu
+      - ./default.conf:/etc/nginx/conf.d/default.conf # Menyambungkan file config Nginx
+    depends_on:
+      - php
+    networks:
+      - app-network
+
+  # 2. Service PHP-FPM (BARU - Pengganti PHP-Apache)
+  # Ini adalah "koki" yang memproses PHP-mu
   php:
     build:
       context: .
-      dockerfile: Dockerfile
-    working_dir: /var/www/html
-    ports:
-      - "8080:80"
+      dockerfile: Dockerfile # Akan membaca Dockerfile (FPM) baru
+    working_dir: /var/www/html # Path kodemu
     volumes:
       - .:/var/www/html
     depends_on:
       - mysql
-    environment:
+    environment: # Kredensial DB-mu (ini sama dari proyekmu)
       - DB_HOST=mysql
       - DB_NAME=webpharmacy
       - DB_USER=appuser
@@ -20,6 +33,7 @@ services:
     networks:
       - app-network
 
+  # 3. Service MySQL (SAMA PERSIS seperti punyamu)
   mysql:
     image: mysql:8.0
     environment:
@@ -29,12 +43,13 @@ services:
       MYSQL_PASSWORD: password
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./webpharmacy.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./webpharmacy.sql:/docker-entrypoint-initdb.d/docker.sql
     ports:
-      - "3307:3306"
+      - "3307:3306" # Tetap pakai port 3307-mu
     networks:
       - app-network
 
+  # 4. Service PhpMyAdmin (SAMA PERSIS seperti punyamu)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
