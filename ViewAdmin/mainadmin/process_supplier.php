@@ -2,45 +2,64 @@
 session_start();
 require_once '../../Connection/connect.php';
 
+// Dapatkan koneksi database
+$conn = getConnection();
+
 header('Content-Type: text/plain');
 
 $action = $_POST['action'] ?? '';
 
 switch($action) {
     case 'add':
-        addSupplier();
+        addSupplier($conn);
         break;
     case 'update':
-        updateSupplier();
+        updateSupplier($conn);
         break;
     case 'delete':
-        deleteSupplier();
+        deleteSupplier($conn);
         break;
     case 'get':
-        getSupplier();
+        getSupplier($conn);
         break;
     case 'list':
-        listSuppliers();
+        listSuppliers($conn);
         break;
     case 'generate_id':
-        generateSupplierId();
+        generateSupplierId($conn);
         break;
     default:
         echo 'error|Invalid action';
 }
 
-function addSupplier() {
-    global $conn;
+// Tutup koneksi setelah selesai
+closeConnection($conn);
+
+// ====== FUNGSI TAMBAH SUPPLIER ======
+function addSupplier($conn) {
+    $company_name = trim($_POST['company_name'] ?? '');
+    $phone_number = trim($_POST['phone_number'] ?? '');
+    $address = trim($_POST['address'] ?? '');
     
-    // Gunakan fungsi untuk generate ID baru
-    $supplier_id = generateSupplierId();
+    if (empty($company_name) || empty($phone_number) || empty($address)) {
+        echo 'error|Semua field wajib diisi';
+        return;
+    }
     
-    // Ambil data supplier lainnya
-    $company_name = trim($_POST['company_name']);
-    $phone_number = trim($_POST['phone_number']);
-    $address = trim($_POST['address']);
+    // Generate ID otomatis
+    $result = $conn->query("SELECT supplier_id FROM suppliers ORDER BY supplier_id DESC LIMIT 1");
     
-    // Insert new supplier
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $lastId = $row['supplier_id'];
+        $number = intval(substr($lastId, 3)) + 1;
+    } else {
+        $number = 1;
+    }
+    
+    $supplier_id = 'SUP' . str_pad($number, 3, '0', STR_PAD_LEFT);
+    
+    // Insert supplier baru
     $stmt = $conn->prepare("INSERT INTO suppliers (supplier_id, company_name, phone_number, address) 
                            VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssss", $supplier_id, $company_name, $phone_number, $address);
@@ -54,13 +73,17 @@ function addSupplier() {
     $stmt->close();
 }
 
-function updateSupplier() {
-    global $conn;
+// ====== FUNGSI UPDATE SUPPLIER ======
+function updateSupplier($conn) {
+    $supplier_id = trim($_POST['supplier_id'] ?? '');
+    $company_name = trim($_POST['company_name'] ?? '');
+    $phone_number = trim($_POST['phone_number'] ?? '');
+    $address = trim($_POST['address'] ?? '');
     
-    $supplier_id = trim($_POST['supplier_id']);
-    $company_name = trim($_POST['company_name']);
-    $phone_number = trim($_POST['phone_number']);
-    $address = trim($_POST['address']);
+    if (empty($supplier_id) || empty($company_name) || empty($phone_number) || empty($address)) {
+        echo 'error|Data tidak lengkap';
+        return;
+    }
     
     $stmt = $conn->prepare("UPDATE suppliers SET company_name=?, phone_number=?, address=? 
                            WHERE supplier_id=?");
@@ -75,10 +98,14 @@ function updateSupplier() {
     $stmt->close();
 }
 
-function deleteSupplier() {
-    global $conn;
+// ====== FUNGSI HAPUS SUPPLIER ======
+function deleteSupplier($conn) {
+    $supplier_id = $_POST['supplier_id'] ?? '';
     
-    $supplier_id = $_POST['supplier_id'];
+    if (empty($supplier_id)) {
+        echo 'error|ID supplier tidak valid';
+        return;
+    }
     
     $stmt = $conn->prepare("DELETE FROM suppliers WHERE supplier_id = ?");
     $stmt->bind_param("s", $supplier_id);
@@ -92,10 +119,14 @@ function deleteSupplier() {
     $stmt->close();
 }
 
-function getSupplier() {
-    global $conn;
+// ====== FUNGSI GET SUPPLIER BY ID ======
+function getSupplier($conn) {
+    $supplier_id = $_POST['supplier_id'] ?? '';
     
-    $supplier_id = $_POST['supplier_id'];
+    if (empty($supplier_id)) {
+        echo 'error|ID supplier tidak valid';
+        return;
+    }
     
     $stmt = $conn->prepare("SELECT supplier_id, company_name, phone_number, address 
                            FROM suppliers WHERE supplier_id = ?");
@@ -103,16 +134,7 @@ function getSupplier() {
     $stmt->execute();
     $result = $stmt->get_result();
     
-            if ($row) {
-                $last_id = $row['user_id'];
-                // Ambil angka terakhir setelah 'CUS'
-                $last_number = (int) substr($last_id, 3);
-                $new_id = 'SUP' . str_pad($last_number + 1, 3, '0', STR_PAD_LEFT); // Format CUS001, CUS002, ...
-            } else {
-                $new_id = 'SUP001'; // Jika belum ada data, mulai dari CUS001
-            }
-
-    if($result->num_rows > 0) {
+    if ($result->num_rows > 0) {
         $supplier = $result->fetch_assoc();
         echo 'success|' . 
              $supplier['supplier_id'] . '|' . 
@@ -126,9 +148,8 @@ function getSupplier() {
     $stmt->close();
 }
 
-function listSuppliers() {
-    global $conn;
-    
+// ====== FUNGSI LIST SEMUA SUPPLIER ======
+function listSuppliers($conn) {
     $keyword = isset($_POST['search']) ? trim($_POST['search']) : '';
     
     if (!empty($keyword)) {
@@ -171,24 +192,22 @@ function listSuppliers() {
     if(isset($stmt)) $stmt->close();
 }
 
-function generateSupplierId() {
-    global $conn;
-    
+// ====== FUNGSI GENERATE ID BARU ======
+function generateSupplierId($conn) {
     // Ambil supplier_id terakhir
     $result = $conn->query("SELECT supplier_id FROM suppliers ORDER BY supplier_id DESC LIMIT 1");
     
-    // Cek apakah ada data supplier
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $lastId = $row['supplier_id'];
-        // Ambil angka dari ID terakhir dan tambahkan 1
         $number = intval(substr($lastId, 3)) + 1;
     } else {
-        $number = 1; // Jika belum ada data, mulai dari 1
+        $number = 1;
     }
     
-    // Format ID baru
     $newId = 'SUP' . str_pad($number, 3, '0', STR_PAD_LEFT);
-    return $newId;
+    
+    // Echo untuk dikirim ke JavaScript
+    echo 'success|' . $newId;
 }
 ?>

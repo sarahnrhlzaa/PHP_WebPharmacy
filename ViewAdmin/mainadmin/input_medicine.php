@@ -51,7 +51,6 @@ if (isset($_GET['id'])) {
 $query_supplier = "SELECT supplier_id, company_name FROM suppliers ORDER BY company_name ASC";
 $result_supplier = $conn->query($query_supplier);
 
-closeConnection($conn);
 ?>
 
 <!DOCTYPE html>
@@ -61,54 +60,6 @@ closeConnection($conn);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $edit_mode ? 'Edit' : 'Input'; ?> Medicine - PharmaCare</title>
     <link rel="stylesheet" href="../cssadmin/input_medicine.css">
-    <style>
-        /* Style untuk info admin */
-        .admin-info {
-            margin-top: 15px;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #92a0e0ff 0%, #cea6f6ff 100%);
-            border-radius: 8px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-        }
-        
-        .admin-info svg {
-            flex-shrink: 0;
-        }
-        
-        .admin-info-text {
-            flex: 1;
-        }
-        
-        .admin-info strong {
-            font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .admin-info small {
-            display: block;
-            margin-top: 4px;
-            opacity: 0.9;
-            font-size: 12px;
-        }
-        
-        .history-info {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-left: 3px solid #667eea;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #666;
-        }
-        
-        .history-info strong {
-            color: #333;
-        }
-    </style>
 </head>
 <body>
     
@@ -404,5 +355,8 @@ closeConnection($conn);
     </main>
 
     <script src="../jsadmin/input_medicine.js"></script>
+    <?php
+    closeConnection($conn);
+    ?>
 </body>
 </html>

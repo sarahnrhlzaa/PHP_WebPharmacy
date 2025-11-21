@@ -1,3 +1,17 @@
+<?php
+session_start();
+require_once '../../Connection/connect.php';
+$conn = getConnection();
+
+// Cek apakah user sudah login
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+include 'navbar.php';
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,7 +21,6 @@
     <link rel="stylesheet" href="../cssadmin/supplier.css">
 </head>
 <body>
-<?php include 'navbar.php';?>
     <div class="container">
         <h1 class="page-title">Data Supplier</h1>
         
@@ -71,5 +84,8 @@
     <div id="toast" class="toast"></div>
 
     <script src="../jsadmin/supplier.js"></script>
+    <?php
+    closeConnection($conn);
+    ?>
 </body>
 </html>

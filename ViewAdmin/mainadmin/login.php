@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($row = $res->fetch_assoc()) {
  
-      if (hash_equals($row['password'], $password)) {
+      if (password_verify($password, $row['password'])) {
         $_SESSION['admin_id']  = $row['admin_id'];   
         $_SESSION['username']  = $row['username'];
         session_regenerate_id(true);
@@ -41,8 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error = 'Username atau password salah.';
   }
 }
-
-$conn->close();
 
 function h($s){ return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
 ?>
@@ -76,5 +74,8 @@ function h($s){ return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
     </div>
   </div>
   <script src="../jsadmin/login.js"></script>
+  <?php
+  closeConnection($conn);
+  ?>
 </body>
 </html>

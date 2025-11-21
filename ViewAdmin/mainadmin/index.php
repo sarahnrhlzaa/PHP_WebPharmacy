@@ -1,9 +1,14 @@
 <?php
 session_start();
+require_once '../../Connection/connect.php';
+$conn = getConnection();
+
 if (!isset($_SESSION['username'])) {
     header('Location: login.php');
     exit();
 }
+
+include 'navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -15,8 +20,6 @@ if (!isset($_SESSION['username'])) {
     <link rel="stylesheet" href="../cssadmin/index.css">
 </head>
 <body>
-<?php include 'navbar.php';?>
-
     <main class="main-content">
         <!-- Slider -->
         <div class="slider-container">
@@ -224,5 +227,8 @@ if (!isset($_SESSION['username'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../jsadmin/home.js"></script>
+    <?php
+    closeConnection($conn);
+    ?>
 </body>
 </html>

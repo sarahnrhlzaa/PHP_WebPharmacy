@@ -1,4 +1,3 @@
-<!-- ==================== MAIN/NAVBAR.PHP ==================== -->
 <?php
 // JANGAN panggil session_start() lagi kalau sudah dipanggil di file utama
 // Cek apakah session sudah dimulai

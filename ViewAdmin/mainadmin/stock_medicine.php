@@ -1,6 +1,7 @@
 <?php
 // session_start();
 require_once '../../Connection/connect.php';
+$conn = getConnection(); // TAMBAHKAN INI - panggil fungsi untuk dapat koneksi
 
 // Check if user is logged in
 // if (!isset($_SESSION['user_id'])) {
@@ -14,6 +15,8 @@ $query = "SELECT m.*, s.company_name as supplier_name
           LEFT JOIN suppliers s ON m.supplier_id = s.supplier_id 
           ORDER BY m.medicine_name ASC";
 $result = $conn->query($query);
+
+include 'navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -22,11 +25,9 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../cssadmin/stock_medicine.css">
-    <title>Stock Medicine - PharmaCare</title>
+    <title>Stock Medicine-PharmaCare</title>
 </head>
 <body>
-
-<?php include 'navbar.php'?>
     <div class="container">
         <div class="title-stock">
             <h1>📦 Stock Medicine</h1>
@@ -129,7 +130,9 @@ $result = $conn->query($query);
             <iframe id="modalFrame" src="" style="width: 100%; height: 85vh; border: none;"></iframe>
         </div>
     </div>
-
+<?php
+closeConnection($conn); // TAMBAHKAN INI - tutup koneksi
+?>
     <script src="../jsadmin/stock_medicine.js"></script>
 </body>
 </html>
