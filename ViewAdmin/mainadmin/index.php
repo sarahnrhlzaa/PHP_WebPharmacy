@@ -21,7 +21,7 @@ include 'navbar.php';
 </head>
 <body>
     <main class="main-content">
-        <!-- Slider -->
+        <!-- Slider-->
         <div class="slider-container">
             <div class="slider">
                 <div class="slide active" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
