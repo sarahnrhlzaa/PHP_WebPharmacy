@@ -5,7 +5,7 @@
 name: CI/CD Auto Pull and Rebuild
 
 # Kapan workflow ini akan dijalankan:
-# 1. Ketika ada push ke branch master (otomatis)
+# 1. Ketika ada push ke branch main (otomatis)
 # 2. Manual trigger melalui GitHub Actions tab
 on:
   push:
@@ -14,13 +14,13 @@ on:
 
 jobs:
   PHP_WebPharmacy:
-    runs-on: [wappharmacy-laptop-sarah]
+    runs-on: [self-hosted, wappharmacy-laptop-sarah]
     
     steps:
     # Step 0: Detect project path dynamically
     - name: Set project path
       run: |
-        PROJECT_PATH=$(find /home -name 'PHP_WebPharmacy' -type d 2>/dev/null | head -1)
+        PROJECT_PATH=$(find /home/sarahnrhlzaa -name 'PHP_WebPharmacy' -type d 2>/dev/null | head -1)
         if [ -z "$PROJECT_PATH" ]; then
           echo "❌ Error: Folder PHP_WebPharmacy tidak ditemukan di /home"
           echo "Pastikan project sudah di-clone ke salah satu user directory"
