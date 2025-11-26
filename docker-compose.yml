@@ -15,7 +15,7 @@ services:
       - app-network
 
   # 2. Service PHP-FPM (BARU - Pengganti PHP-Apache)
-  # Ini adalah "koki" yang memproses PHP-mu
+  # Ini adalah "koki" yang memproses PHP
   php:
     build:
       context: .

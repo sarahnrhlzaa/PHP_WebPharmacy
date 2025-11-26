@@ -2,20 +2,8 @@
 session_start();
 require_once '../../Connection/connect.php';
 
-// Cek login
-if (empty($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit();
-}
-
-// Cek checkout items
-if (empty($_SESSION['checkout_items'])) {
-    header('Location: cart.php');
-    exit();
-}
-
-// Validasi form
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+// Validasi Akses
+if (empty($_SESSION['user_id']) || empty($_SESSION['checkout_items']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: checkout.php');
     exit();
 }
@@ -23,159 +11,115 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $conn = getConnection();
 
 try {
-    // Start transaction
     $conn->begin_transaction();
     
     $userId = $_SESSION['user_id'];
-    $checkoutItems = $_SESSION['checkout_items'];
+    $items = $_SESSION['checkout_items'];
     
-    // Ambil data dari form
-    $userName = $_POST['user_name'] ?? '';
-    $userEmail = $_POST['user_email'] ?? '';
-    $userPhone = $_POST['user_phone'] ?? '';
-    $paymentMethod = $_POST['payment_method'] ?? 'transfer';
-    $notes = $_POST['notes'] ?? '';
-    
-    // Handle address
-    $addressOption = $_POST['address-option'] ?? 'new';
-    if ($addressOption === 'saved') {
-        // Ambil address dari database user
+    // 1. SETUP ALAMAT
+    if (($_POST['address-option'] ?? '') === 'saved') {
         $stmt = $conn->prepare("SELECT address FROM users WHERE user_id = ?");
-        $stmt->bind_param("i", $userId);
+        $stmt->bind_param("s", $userId);
         $stmt->execute();
-        $result = $stmt->get_result();
-        $userData = $result->fetch_assoc();
-        $userAddress = $userData['address'];
+        $res = $stmt->get_result()->fetch_assoc();
+        $userAddress = $res['address'];
         $stmt->close();
     } else {
-        // Gunakan address baru dari form
-        $address = $_POST['address'] ?? '';
-        $city = $_POST['city'] ?? '';
-        $postalCode = $_POST['postal_code'] ?? '';
+        $userAddress = ($_POST['address'] ?? '') . ", " . ($_POST['city'] ?? '') . " " . ($_POST['postal_code'] ?? '');
+    }
+    
+    // 2. HITUNG TOTAL
+    $totalAmount = 10000; // Ongkir
+    foreach ($items as $i) $totalAmount += $i['price'] * $i['qty'];
+    
+    // ============================================================
+    // 🔥 LOGIKA BARU: RANDOM ORDER ID (Format: ORD-XXXXXX)
+    // ============================================================
+    // Total 10 Karakter (ORD- + 6 huruf/angka acak)
+    
+    $newOrderId = '';
+    $foundUnique = false;
+    $maxTries = 5; // Coba generate maksimal 5 kali jika kebetulan kembar
+    
+    for ($i = 0; $i < $maxTries; $i++) {
+        // Generate 6 karakter acak (Angka & Huruf Besar)
+        // Contoh hasil: 8K2P9M
+        $randomString = strtoupper(substr(bin2hex(random_bytes(4)), 0, 6));
+        $tempId = 'ORD-' . $randomString;
         
-        if (empty($address) || empty($city) || empty($postalCode)) {
-            throw new Exception('Please fill in all address fields');
+        // Cek apakah ID ini sudah ada di database?
+        $stmtCheck = $conn->prepare("SELECT order_id FROM orders WHERE order_id = ?");
+        $stmtCheck->bind_param("s", $tempId);
+        $stmtCheck->execute();
+        $stmtCheck->store_result();
+        
+        if ($stmtCheck->num_rows == 0) {
+            // Jika belum ada (unik), pakai ID ini!
+            $newOrderId = $tempId;
+            $foundUnique = true;
+            $stmtCheck->close();
+            break;
         }
-        
-        $userAddress = $address . ", " . $city . " - " . $postalCode;
+        $stmtCheck->close();
     }
     
-    // Hitung total
-    $subtotal = 0;
-    $shipping = 10000;
-    foreach ($checkoutItems as $item) {
-        $subtotal += $item['price'] * $item['qty'];
-    }
-    $totalAmount = $subtotal + $shipping;
-    
-    // Insert ke tabel orders (status default: pending)
-    $stmt = $conn->prepare("
-        INSERT INTO orders (
-            user_id, 
-            user_name,
-            user_email,
-            user_phone,
-            user_address,
-            order_notes,
-            total_amount, 
-            payment_method, 
-            status,
-            created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
-    ");
-    
-    $stmt->bind_param(
-        "isssssds",
-        $userId,
-        $userName,
-        $userEmail,
-        $userPhone,
-        $userAddress,
-        $notes,
-        $totalAmount,
-        $paymentMethod
-    );
-    
-    if (!$stmt->execute()) {
-        throw new Exception('Failed to create order: ' . $stmt->error);
+    if (!$foundUnique) {
+        throw new Exception("Gagal membuat Order ID unik. Silakan coba lagi.");
     }
     
-    $orderId = $conn->insert_id;
+    // ============================================================
+    
+    // 3. INSERT ORDER (Header)
+    $stmt = $conn->prepare("INSERT INTO orders (order_id, user_id, user_name, user_email, user_phone, user_address, order_notes, total_amount, payment_method, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())");
+    $stmt->bind_param("sssssssds", $newOrderId, $userId, $_POST['user_name'], $_POST['user_email'], $_POST['user_phone'], $userAddress, $_POST['notes'], $totalAmount, $_POST['payment_method']);
+    
+    if (!$stmt->execute()) throw new Exception("Gagal membuat order: " . $stmt->error);
     $stmt->close();
     
-    // Insert ke tabel orders_detail
-    $stmt = $conn->prepare("
-        INSERT INTO orders_detail (
-            order_id, 
-            medicine_id,
-            medicine_name,
-            quantity, 
-            price, 
-            subtotal
-        ) VALUES (?, ?, ?, ?, ?, ?)
-    ");
+    // 4. INSERT DETAIL BARANG
+    // Generate ID Detail (OD-xxxx) - Ini boleh urut global karena internal sistem
+    $qD = $conn->query("SELECT orderdetail_id FROM orders_detail ORDER BY orderdetail_id DESC LIMIT 1");
+    $lastD = ($qD->num_rows > 0) ? $qD->fetch_assoc()['orderdetail_id'] : 'OD-00000';
+    $numD = (int)substr($lastD, 3);
     
-    foreach ($checkoutItems as $item) {
-        $medicineId = $item['id'];
-        $medicineName = $item['name'];
-        $quantity = $item['qty'];
-        $price = $item['price'];
-        $itemSubtotal = $price * $quantity;
-        
-        $stmt->bind_param(
-            "issidi",
-            $orderId,
-            $medicineId,
-            $medicineName,
-            $quantity,
-            $price,
-            $itemSubtotal
-        );
-        
-        if (!$stmt->execute()) {
-            throw new Exception('Failed to add order items: ' . $stmt->error);
-        }
+    $stmtD = $conn->prepare("INSERT INTO orders_detail (orderdetail_id, order_id, medicine_id, medicine_name, quantity, price, subtotal) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    
+    foreach ($items as $item) {
+        $numD++;
+        $newDetailId = 'OD-' . str_pad($numD, 5, '0', STR_PAD_LEFT);
+        $sub = $item['price'] * $item['qty'];
+        $stmtD->bind_param("ssssidd", $newDetailId, $newOrderId, $item['id'], $item['name'], $item['qty'], $item['price'], $sub);
+        $stmtD->execute();
     }
-    $stmt->close();
+    $stmtD->close();
     
-    // Commit transaction
-    $conn->commit();
-    
-    // PENTING: Hapus items dari cart
-    if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
-        // Ambil medicine_id dari checkout items
-        $checkoutItemIds = array_keys($checkoutItems);
-        
-        // Hapus satu per satu dari cart
-        foreach ($checkoutItemIds as $medicineId) {
-            if (isset($_SESSION['cart'][$medicineId])) {
-                unset($_SESSION['cart'][$medicineId]);
-            }
+    // 5. BERSIHKAN CART
+    $boughtIds = array_keys($items);
+    // Hapus DB
+    try {
+        if (!empty($boughtIds)) {
+            $idsStr = "'" . implode("','", $boughtIds) . "'";
+            $conn->query("DELETE FROM carts WHERE user_id = '$userId' AND medicine_id IN ($idsStr)");
         }
-        
-        // Update cart di session (pastikan perubahan tersimpan)
-        $_SESSION['cart'] = array_filter($_SESSION['cart']);
-    }
+    } catch (Exception $e) {}
     
-    // Clear checkout items
+    // Hapus Session
+    foreach ($boughtIds as $bid) {
+        if (isset($_SESSION['cart'][$bid])) unset($_SESSION['cart'][$bid]);
+    }
     unset($_SESSION['checkout_items']);
     
-    // Set success message
-    $_SESSION['order_success'] = true;
-    $_SESSION['last_order_id'] = $orderId;
+    $conn->commit();
     
-    // Redirect ke success page
-    header('Location: order_success.php?order_id=' . $orderId);
+    // Redirect Sukses
+    header("Location: order_success.php?order_id=" . $newOrderId);
     exit();
     
 } catch (Exception $e) {
-    // Rollback jika ada error
     $conn->rollback();
-    
     $_SESSION['checkout_error'] = $e->getMessage();
-    header('Location: checkout.php');
+    header("Location: checkout.php");
     exit();
-    
 } finally {
     closeConnection($conn);
 }
