@@ -122,8 +122,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
             // Insert user baru ke database
-            $stmt = $conn->prepare("INSERT INTO users (user_id, username, email, password, created_at) VALUES (?, ?, ?, ?, NOW())");
-            $stmt->bind_param('ssss', $new_id, $username, $email, $password_hash);
+            // Kita tambahkan kolom full_name dan isi dengan string kosong ""
+$default_fullname = ""; 
+
+$stmt = $conn->prepare("INSERT INTO users (user_id, username, email, password, full_name, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+// Perhatikan 'sssss' (tambah satu 's') dan variabel $default_fullname
+$stmt->bind_param('sssss', $new_id, $username, $email, $password_hash, $default_fullname);
 
             if ($stmt->execute()) {
                 // Set session setelah berhasil register

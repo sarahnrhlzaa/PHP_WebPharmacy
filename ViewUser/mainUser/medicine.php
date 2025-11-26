@@ -5,12 +5,18 @@ require_once '../../Connection/connect.php';
 // Get all medicines from database
 $conn = getConnection();
 
+function isNewProduct($createdAt) {
+    $thresholdDate = date('Y-m-d H:i:s', strtotime('-3 days'));
+    return $createdAt > $thresholdDate;
+}
+
 // Get wellness products
 $sql_wellness = "SELECT medicine_id, medicine_name, category, price, image_path, description, 
                  benefits, dosage, warnings, rating, tag
                  FROM medicines
                  WHERE category = 'wellness' 
-                 ORDER BY medicine_id";
+                 ORDER BY created_at DESC";
+
 $result_wellness = $conn->query($sql_wellness);
 $wellness_products = $result_wellness->fetch_all(MYSQLI_ASSOC);
 
@@ -19,7 +25,8 @@ $sql_medicine = "SELECT medicine_id, medicine_name, category, price, image_path,
                  benefits, dosage, warnings, rating, tag
                  FROM medicines
                  WHERE category = 'medicine' 
-                 ORDER BY medicine_id";
+                 ORDER BY created_at DESC"; 
+
 $result_medicine = $conn->query($sql_medicine);
 $medicine_products = $result_medicine->fetch_all(MYSQLI_ASSOC);
 
@@ -225,5 +232,6 @@ function getImagePath($image_path) {
     <span id="toast-message">Item added to cart!</span>
 </div>
 <script src="../jsUser/medicine.js"></script>
+<?php include 'footer.php'; ?>
 </body>
 </html>

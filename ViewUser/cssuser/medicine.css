@@ -941,4 +941,23 @@ header > *{
         height: 2.8rem;
         font-size: 1.8rem;
     }
+
+    .product-card {
+    position: relative; /* Penting agar label bisa diposisikan absolut terhadap kartu */
+    }
+
+    .new-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #e74c3c; /* Warna Merah */
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 2; /* Pastikan di atas gambar */
+    text-transform: uppercase;
+    }
 }
