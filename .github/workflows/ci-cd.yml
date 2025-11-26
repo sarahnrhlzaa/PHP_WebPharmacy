@@ -9,7 +9,7 @@ name: CI/CD Auto Pull and Rebuild
 # 2. Manual trigger melalui GitHub Actions tab
 on:
   push:
-    branches: [ main ]  # Hanya berjalan ketika push ke master
+    branches: [ main ]  # Hanya berjalan ketika push ke main
   workflow_dispatch:      # Bisa dijalankan manual juga
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
         echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
         echo "✅ Found project at: $PROJECT_PATH"
         
-    # Step 1: Ambil kode terbaru dari branch master
+    # Step 1: Ambil kode terbaru dari branch main
     - name: Pull latest changes
       working-directory: ${{ env.PROJECT_PATH }}
       run: |

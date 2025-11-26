@@ -1,0 +1,134 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: 60px 40px;
+    max-width: 900px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.logo {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    color: #333;
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 16px;
+}
+
+.role-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.role-card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.role-card {
+    background: white;
+    border: 3px solid #e0e0e0;
+    border-radius: 16px;
+    padding: 40px 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.role-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.role-card.admin {
+    border-color: #667eea;
+}
+
+.role-card.admin:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.role-card.user {
+    border-color: #f093fb;
+}
+
+.role-card.user:hover {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.role-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.role-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.role-description {
+    font-size: 14px;
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+.role-card:hover .role-description,
+.role-card:hover .role-title {
+    color: white;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #999;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 40px 20px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .role-container {
+        grid-template-columns: 1fr;
+    }
+}
