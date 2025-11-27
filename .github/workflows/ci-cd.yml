@@ -15,19 +15,30 @@ on:
 jobs:
   PHP_WebPharmacy:
     runs-on: [self-hosted, wappharmacy-laptop-sarah]
-    
-    steps:
-    # Step 0: Detect project path dynamically
+
+    # Step 0: Set project path (GANTI JADI HARDCODE)
     - name: Set project path
       run: |
-        PROJECT_PATH=$(find /home/sarahnrhlzaa -name 'PHP_WebPharmacy' -type d 2>/dev/null | head -1)
-        if [ -z "$PROJECT_PATH" ]; then
-          echo "❌ Error: Folder PHP_WebPharmacy tidak ditemukan di /home"
-          echo "Pastikan project sudah di-clone ke salah satu user directory"
+        PROJECT_PATH="/home/sarahnrhlzaa/PHP_WebPharmacy"
+        if [ ! -d "$PROJECT_PATH/.git" ]; then
+        echo "❌ Error: $PROJECT_PATH bukan git repository"
+        ls -la "$PROJECT_PATH/.git" || echo "Folder .git tidak ada"
           exit 1
         fi
         echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
-        echo "✅ Found project at: $PROJECT_PATH"
+        echo "✅ Project path set to: $PROJECT_PATH"
+    # steps:
+    # # Step 0: Detect project path dynamically
+    # - name: Set project path
+    #   run: |
+    #     PROJECT_PATH=$(find /home/sarahnrhlzaa -name 'PHP_WebPharmacy' -type d 2>/dev/null | head -1)
+    #     if [ -z "$PROJECT_PATH" ]; then
+    #       echo "❌ Error: Folder PHP_WebPharmacy tidak ditemukan di /home"
+    #       echo "Pastikan project sudah di-clone ke salah satu user directory"
+    #       exit 1
+    #     fi
+    #     echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
+    #     echo "✅ Found project at: $PROJECT_PATH"
         
     # Step 1: Ambil kode terbaru dari branch main
     - name: Pull latest changes
