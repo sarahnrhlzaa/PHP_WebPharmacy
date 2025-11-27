@@ -16,6 +16,7 @@ jobs:
   PHP_WebPharmacy:
     runs-on: [self-hosted, wappharmacy-laptop-sarah]
 
+    steps:
     # Step 0: Set project path (GANTI JADI HARDCODE)
     - name: Set project path
       run: |
