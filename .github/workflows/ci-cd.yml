@@ -95,7 +95,7 @@ jobs:
   # ======================== JOB UNTUK NEYZA ==========================
 
   PHP_WebPharmacy-Neyza:
-    runs-on: [self-hosted, pharmacy-laptop-neyza]
+    runs-on: [self-hosted, webpharmacy-laptop-neyza]
 
     steps:
       # Step 0: Set project path (HARDCODE)
