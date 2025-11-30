@@ -1,28 +1,10 @@
 <?php
-// transactions.php - Halaman utama untuk menampilkan semua transaksi
-
-// Start session FIRST before any output
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Koneksi database
+// transactions.php - Main page for transaction management
+session_start();
 require_once '../../Connection/connect.php';
 
-// Jika connect.php tidak mendefinisikan $pdo, buat koneksi manual
-if (!isset($pdo)) {
-    $host = 'localhost';
-    $dbname = 'webpharmacy';
-    $username = 'root';
-    $password = '';
-
-    try {
-        $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch(PDOException $e) {
-        die("Connection failed: " . $e->getMessage());
-    }
-}
+// Pakai getConnection() yang return mysqli
+$conn = getConnection();
 
 // Query untuk mengambil semua transaksi (orders dan purchases)
 $query = "
@@ -62,10 +44,18 @@ $query = "
     ORDER BY created_at DESC
 ";
 
-// Execute the query
-$stmt = $pdo->prepare($query);
-$stmt->execute();
-$transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$result = $conn->query($query);
+
+if (!$result) {
+    die("Query Error: " . $conn->error);
+}
+
+// Fetch semua data ke array
+$transactions = [];
+while ($row = $result->fetch_assoc()) {
+    $transactions[] = $row;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -74,281 +64,10 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manajemen Transaksi - Web Pharmacy</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-        }
-
-        /* Main content wrapper - NO margin, let navbar handle the spacing */
-        .main-content {
-            padding: 20px;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
-
-        /* When sidebar is open, add margin */
-        body:not(.sidebar-closed) .main-content {
-            margin-left: 250px;
-        }
-
-        /* When sidebar is closed, no margin */
-        body.sidebar-closed .main-content {
-            margin-left: 0;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .container h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-        }
-
-        .header-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #45a049;
-        }
-
-        .btn-secondary {
-            background: #2196F3;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #0b7dda;
-        }
-
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 13px;
-        }
-
-        .filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .filter-group label {
-            font-size: 13px;
-            color: #666;
-            font-weight: 500;
-        }
-
-        select, input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .stat-card.green {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        }
-
-        .stat-card.orange {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .stat-card.blue {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .stat-label {
-            font-size: 13px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th {
-            background: #f8f9fa;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #dee2e6;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .badge {
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            display: inline-block;
-        }
-
-        .badge-order {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .badge-purchase {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
-
-        .badge-completed {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .badge-pending {
-            background: #fff3e0;
-            color: #e65100;
-        }
-
-        .badge-received {
-            background: #e0f2f1;
-            color: #00695c;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-view {
-            background: #2196F3;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 12px;
-        }
-
-        .btn-view:hover {
-            background: #0b7dda;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-
-        .empty-state svg {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0 !important;
-                padding: 15px;
-            }
-
-            body.sidebar-closed .main-content,
-            body:not(.sidebar-closed) .main-content {
-                margin-left: 0 !important;
-            }
-
-            .container {
-                padding: 15px;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 8px 6px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../cssadmin/transaction.css">
 </head>
 <body>
     <?php include 'navbar.php'; ?>
-    
     <div class="main-content">
         <div class="container">
             <h1>📊 Manajemen Transaksi</h1>
@@ -466,7 +185,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?php echo date('d/m/Y H:i', strtotime($transaction['created_at'])); ?></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="view_transaction.php?type=<?php echo $transaction['transaction_type']; ?>&id=<?php echo $transaction['transaction_id']; ?>" class="btn-view">
+                                        <a href="process_transaction.php?action=view&type=<?php echo $transaction['transaction_type']; ?>&id=<?php echo $transaction['transaction_id']; ?>" class="btn-view">
                                             👁️ Detail
                                         </a>
                                     </div>
@@ -478,67 +197,11 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php endif; ?>
         </div>
     </div>
-
-    <script>
-        // Sync sidebar state with body class for proper margin handling
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if sidebar exists and monitor its state
-            const sidebar = document.querySelector('.sidebar');
-            if (sidebar) {
-                // Initial state check
-                if (sidebar.classList.contains('closed')) {
-                    document.body.classList.add('sidebar-closed');
-                } else {
-                    document.body.classList.remove('sidebar-closed');
-                }
-
-                // Watch for sidebar toggle (using MutationObserver)
-                const observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        if (mutation.attributeName === 'class') {
-                            if (sidebar.classList.contains('closed')) {
-                                document.body.classList.add('sidebar-closed');
-                            } else {
-                                document.body.classList.remove('sidebar-closed');
-                            }
-                        }
-                    });
-                });
-
-                observer.observe(sidebar, { attributes: true });
-            }
-        });
-
-        function filterTable() {
-            const typeFilter = document.getElementById('filterType').value.toLowerCase();
-            const statusFilter = document.getElementById('filterStatus').value.toLowerCase();
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const table = document.getElementById('transactionTable');
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                const type = row.cells[0].textContent.toLowerCase();
-                const status = row.cells[6].textContent.toLowerCase();
-                const allText = row.textContent.toLowerCase();
-
-                let showRow = true;
-
-                if (typeFilter !== 'all' && !type.includes(typeFilter)) {
-                    showRow = false;
-                }
-
-                if (statusFilter !== 'all' && !status.includes(statusFilter)) {
-                    showRow = false;
-                }
-
-                if (searchInput && !allText.includes(searchInput)) {
-                    showRow = false;
-                }
-
-                row.style.display = showRow ? '' : 'none';
-            }
-        }
-    </script>
+    
+    <script src="../jsadmin/transaction.js"></script>
+    
+    <?php
+    closeConnection($conn);
+    ?>
 </body>
 </html>

@@ -56,14 +56,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('transactionChart');
     
     if (ctx) {
+        // Data dari PHP (sudah di-inject di index.php)
+        const labels = typeof formattedLabels !== 'undefined' ? formattedLabels : ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+        const dataIn = typeof chartDataIn !== 'undefined' ? chartDataIn : [0, 0, 0, 0, 0, 0, 0];
+        const dataOut = typeof chartDataOut !== 'undefined' ? chartDataOut : [0, 0, 0, 0, 0, 0, 0];
+        
         const transactionChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+                labels: labels,
                 datasets: [
                     {
                         label: 'Transaksi Masuk',
-                        data: [40, 30, 50, 45, 60, 35, 25],
+                        data: dataIn,
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         borderWidth: 2,
@@ -77,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     {
                         label: 'Transaksi Keluar',
-                        data: [24, 18, 35, 30, 42, 25, 15],
+                        data: dataOut,
                         borderColor: '#ef4444',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
                         borderWidth: 2,
@@ -134,7 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             font: {
                                 size: 11
                             },
-                            color: '#6b7280'
+                            color: '#6b7280',
+                            stepSize: 1
                         },
                         grid: {
                             color: 'rgba(0, 0, 0, 0.05)',

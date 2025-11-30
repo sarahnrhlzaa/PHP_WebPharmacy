@@ -368,3 +368,67 @@ document.addEventListener('click', function(e) {
         console.log('Transaction row clicked:', row.id);
     }
 });
+
+// ============================================
+// AUTO-GENERATE TRANSACTION ID
+// ============================================
+
+// Generate Order ID saat halaman add order dibuka
+if (window.location.href.includes('action=add') && window.location.href.includes('type=order')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        const orderIdInput = document.getElementById('orderId');
+        
+        if (orderIdInput && !orderIdInput.value) {
+            // Fetch generate order ID
+            const formData = new FormData();
+            formData.append('ajax_action', 'generate_order_id');
+            
+            fetch('process_transaction.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                const parts = data.split('|');
+                if (parts[0] === 'success') {
+                    orderIdInput.value = parts[1];
+                    console.log('✅ Order ID generated:', parts[1]);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error generating Order ID:', error);
+            });
+        }
+    });
+}
+
+// Generate Purchase ID saat halaman add purchase dibuka
+if (window.location.href.includes('action=add') && window.location.href.includes('type=purchase')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        const purchaseIdInput = document.getElementById('purchaseId');
+        
+        if (purchaseIdInput && !purchaseIdInput.value) {
+            // Fetch generate purchase ID
+            const formData = new FormData();
+            formData.append('ajax_action', 'generate_purchase_id');
+            
+            fetch('process_transaction.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                const parts = data.split('|');
+                if (parts[0] === 'success') {
+                    purchaseIdInput.value = parts[1];
+                    console.log('✅ Purchase ID generated:', parts[1]);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error generating Purchase ID:', error);
+            });
+        }
+    });
+}
+
+console.log('🚀 Transaction auto-ID feature loaded!');

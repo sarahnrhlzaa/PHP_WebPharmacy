@@ -21,19 +21,17 @@ $medicine_data = null;
 
 if (isset($_GET['id'])) {
     $edit_mode = true;
-    $medicine_id = intval($_GET['id']);
+    $medicine_id = $_GET['id']; // VARCHAR bukan INT
     
-    // ✅ JOIN dengan admins untuk info created_by dan updated_by
+    // ✅ Query simple - JOIN ke admins pakai admin_id yang udah ada
     $query = "SELECT m.*, 
-              ca.username as created_by_name,
-              ua.username as updated_by_name
+              a.username as admin_name
               FROM medicines m
-              LEFT JOIN admins ca ON m.created_by = ca.admin_id
-              LEFT JOIN admins ua ON m.updated_by = ua.admin_id
+              LEFT JOIN admins a ON m.admin_id = a.admin_id
               WHERE m.medicine_id = ?";
     
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $medicine_id);
+    $stmt->bind_param("s", $medicine_id);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -95,31 +93,34 @@ $result_supplier = $conn->query($query_supplier);
                     </div>
                 </div>
                 
-                <!-- ✅ HISTORY INFO (hanya tampil di edit mode) -->
+                <!-- ✅ HISTORY INFO - Pakai admin_id yang udah ada -->
                 <?php if ($edit_mode && $medicine_data): ?>
                     <div class="history-info">
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
                             <div>
-                                <strong>📝 Dibuat oleh:</strong> 
-                                <?= htmlspecialchars($medicine_data['created_by_name'] ?? 'Unknown') ?>
+                            <strong>👤 Admin Pengelola:</strong> 
+                            <?= htmlspecialchars($medicine_data['admin_name'] ?? 'Unknown') ?>
+                            <small>(ID: <?= htmlspecialchars($medicine_data['admin_id'] ?? '-') ?>)</small>
+                            </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 5px;">
+                            <div>
+                                <strong>📝 Dibuat:</strong> 
                                 <br>
                                 <small>
                                     <?= isset($medicine_data['created_at']) ? date('d M Y H:i', strtotime($medicine_data['created_at'])) : '-' ?>
                                 </small>
                             </div>
-                            <?php if (!empty($medicine_data['updated_by_name'])): ?>
-                            <div>
-                                <strong>✏️ Terakhir diupdate:</strong> 
-                                <?= htmlspecialchars($medicine_data['updated_by_name']) ?>
-                                <br>
-                                <small>
-                                    <?= isset($medicine_data['updated_at']) ? date('d M Y H:i', strtotime($medicine_data['updated_at'])) : '-' ?>
-                                </small>
-                            </div>
-                            <?php endif; ?>
+                        <div>
+                            <strong>✏️ Terakhir diupdate:</strong> 
+                            <br>
+                            <small>
+                                <?= isset($medicine_data['updated_at']) ? date('d M Y H:i', strtotime($medicine_data['updated_at'])) : '-' ?>
+                            </small>
                         </div>
                     </div>
-                <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
             </div>
 
             <?php if (isset($_SESSION['success'])): ?>
@@ -144,7 +145,10 @@ $result_supplier = $conn->query($query_supplier);
             <?php endif; ?>
 
             <div class="form-card">
-                <form method="POST" action="process_medicine.php?action=<?php echo $edit_mode ? 'update' : 'add'; ?>" enctype="multipart/form-data" id="medicineForm">
+                <<form method="POST" 
+                        action="process_medicine.php?action=<?php echo $edit_mode ? 'update' : 'add'; ?><?php echo isset($_GET['modal']) ? '&modal=1' : ''; ?>" 
+                        enctype="multipart/form-data" 
+                        id="medicineForm">
                     <?php if ($edit_mode): ?>
                         <input type="hidden" name="medicine_id" value="<?php echo $medicine_data['medicine_id']; ?>">
                     <?php endif; ?>

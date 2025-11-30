@@ -1,9 +1,22 @@
 <?php
+// ✅ AKTIFKAN OUTPUT BUFFERING DI AWAL FILE
+ob_start();
+
+// ✅ Matikan error display supaya ga ganggu JSON response
+error_reporting(0);
+ini_set('display_errors', 0);
+
 session_start();
 require_once '../../Connection/connect.php';
 
 // ✅ CEK LOGIN - WAJIB!
 if (!isset($_SESSION['admin_id'])) {
+    if (isset($_GET['modal'])) {
+        ob_clean(); // Bersihkan buffer
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        exit;
+    }
     $_SESSION['error'] = 'Unauthorized! Silakan login terlebih dahulu.';
     header('Location: login.php');
     exit;
@@ -15,9 +28,57 @@ $admin_username = $_SESSION['username'];
 
 $conn = getConnection();
 
-// Tentukan action (add atau update)
+// Tentukan action (add, update, delete)
 $action = $_GET['action'] ?? 'add';
 
+// ========== HANDLE DELETE ==========
+if ($action == 'delete') {
+    $medicine_id = $_GET['id'] ?? '';
+    
+    if (empty($medicine_id)) {
+        $_SESSION['error'] = 'ID obat tidak valid!';
+        header('Location: stock_medicine.php');
+        exit;
+    }
+    
+    // Get image path before delete
+    $get_image = $conn->prepare("SELECT image_path FROM medicines WHERE medicine_id = ?");
+    $get_image->bind_param("s", $medicine_id);
+    $get_image->execute();
+    $result = $get_image->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        $image_path = $row['image_path'];
+        
+        // Delete the medicine
+        $delete_stmt = $conn->prepare("DELETE FROM medicines WHERE medicine_id = ?");
+        $delete_stmt->bind_param("s", $medicine_id);
+        
+        if ($delete_stmt->execute()) {
+            // Delete image file if exists (with error suppression)
+            if (!empty($image_path)) {
+                $project_root = dirname(dirname(__DIR__));
+                $full_path = $project_root . '/' . $image_path;
+                if (file_exists($full_path)) {
+                    @unlink($full_path);
+                }
+            }
+            $_SESSION['success'] = "Obat berhasil dihapus!";
+        } else {
+            $_SESSION['error'] = 'Gagal menghapus obat: ' . $delete_stmt->error;
+        }
+        $delete_stmt->close();
+    } else {
+        $_SESSION['error'] = 'Obat tidak ditemukan!';
+    }
+    $get_image->close();
+    
+    closeConnection($conn);
+    header('Location: stock_medicine.php');
+    exit;
+}
+
+// ========== HANDLE POST REQUEST (ADD/UPDATE) ==========
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Validasi input
@@ -32,9 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $dosage = trim($_POST['dosage'] ?? '');
     $warnings = trim($_POST['warnings'] ?? '');
     
-    // ✅ DEBUG - CEK SUPPLIER ID
-    error_log("Supplier ID dari form: [" . $id_supplier . "]");
-    
     // ✅ VALIDASI SUPPLIER ID EXIST
     $check_supplier = $conn->prepare("SELECT supplier_id FROM suppliers WHERE supplier_id = ?");
     $check_supplier->bind_param("s", $id_supplier);
@@ -42,29 +100,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $supplier_result = $check_supplier->get_result();
     
     if ($supplier_result->num_rows == 0) {
-        $_SESSION['error'] = "Supplier ID '{$id_supplier}' tidak ditemukan di database!";
+        $error_msg = "Supplier ID '{$id_supplier}' tidak ditemukan di database!";
+        $_SESSION['error'] = $error_msg;
+        $check_supplier->close();
+        closeConnection($conn);
+        
+        if (isset($_GET['modal'])) {
+            ob_clean(); // ✅ BERSIHKAN BUFFER SEBELUM JSON
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => $error_msg]);
+            exit;
+        }
+        
         header('Location: input_medicine.php');
         exit;
     }
     $check_supplier->close();
     
-    // ✅ VALIDASI ADMIN ID EXIST
-    $check_admin = $conn->prepare("SELECT admin_id FROM admins WHERE admin_id = ?");
-    $check_admin->bind_param("s", $admin_id);
-    $check_admin->execute();
-    $admin_result = $check_admin->get_result();
-    
-    if ($admin_result->num_rows == 0) {
-        $_SESSION['error'] = "Admin ID '{$admin_id}' tidak ditemukan di database!";
-        header('Location: input_medicine.php');
-        exit;
-    }
-    $check_admin->close();
-    
     // Cek field required
     if (empty($nama_obat) || empty($harga) || empty($expired) || empty($id_supplier) || empty($quantity)) {
-        $_SESSION['error'] = 'Semua field wajib diisi!';
-        header('Location: input_medicine.php' . ($action == 'update' ? '?id=' . intval($_POST['medicine_id'] ?? 0) : ''));
+        $error_msg = 'Semua field wajib diisi!';
+        $_SESSION['error'] = $error_msg;
+        closeConnection($conn);
+        
+        if (isset($_GET['modal'])) {
+            ob_clean(); // ✅ BERSIHKAN BUFFER
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => $error_msg]);
+            exit;
+        }
+        
+        header('Location: input_medicine.php' . ($action == 'update' ? '?id=' . ($_POST['medicine_id'] ?? '') : ''));
         exit;
     }
     
@@ -82,15 +148,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         // Validasi tipe file
         if (!in_array($file_type, $allowed_types)) {
-            $_SESSION['error'] = 'Format file tidak valid! Hanya JPG, JPEG, PNG yang diizinkan.';
-            header('Location: input_medicine.php' . ($action == 'update' ? '?id=' . intval($_POST['medicine_id'] ?? 0) : ''));
+            $error_msg = 'Format file tidak valid! Hanya JPG, JPEG, PNG yang diizinkan.';
+            $_SESSION['error'] = $error_msg;
+            closeConnection($conn);
+            
+            if (isset($_GET['modal'])) {
+                ob_clean();
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $error_msg]);
+                exit;
+            }
+            
+            header('Location: input_medicine.php' . ($action == 'update' ? '?id=' . ($_POST['medicine_id'] ?? '') : ''));
             exit;
         }
         
         // Validasi ukuran file
         if ($file_size > $max_size) {
-            $_SESSION['error'] = 'Ukuran file terlalu besar! Maksimal 2MB.';
-            header('Location: input_medicine.php' . ($action == 'update' ? '?id=' . intval($_POST['medicine_id'] ?? 0) : ''));
+            $error_msg = 'Ukuran file terlalu besar! Maksimal 2MB.';
+            $_SESSION['error'] = $error_msg;
+            closeConnection($conn);
+            
+            if (isset($_GET['modal'])) {
+                ob_clean();
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $error_msg]);
+                exit;
+            }
+            
+            header('Location: input_medicine.php' . ($action == 'update' ? '?id=' . ($_POST['medicine_id'] ?? '') : ''));
             exit;
         }
         
@@ -98,8 +184,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $file_extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $new_filename = 'MED_' . time() . '_' . uniqid() . '.' . $file_extension;
         
-        // Tentukan folder upload
-        $upload_dir = '../../uploads/medicines/';
+        // ✅ FIX: Gunakan __DIR__ untuk dapat path absolut dari file ini
+        // File ini ada di ViewAdmin/mainadmin/, naik 2 level ke root project
+        $project_root = dirname(dirname(__DIR__));
+        $upload_dir = $project_root . '/uploads/medicines/';
         
         // Buat folder jika belum ada
         if (!file_exists($upload_dir)) {
@@ -107,34 +195,69 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         
         $upload_path = $upload_dir . $new_filename;
+        $gambar_path = 'uploads/medicines/' . $new_filename; // Path untuk database (relative)
         
         // Upload file
         if (move_uploaded_file($file['tmp_name'], $upload_path)) {
-            $gambar_path = 'uploads/medicines/' . $new_filename;
             $update_image = true;
         } else {
-            $_SESSION['error'] = 'Gagal mengupload gambar!';
-            header('Location: input_medicine.php' . ($action == 'update' ? '?id=' . intval($_POST['medicine_id'] ?? 0) : ''));
+            // ✅ DEBUG: Log detailed error
+            $error_msg = 'Gagal mengupload gambar! ';
+            $error_msg .= 'Upload dir: ' . $upload_dir . ' | ';
+            $error_msg .= 'Exists: ' . (file_exists($upload_dir) ? 'YES' : 'NO') . ' | ';
+            $error_msg .= 'Writable: ' . (is_writable($upload_dir) ? 'YES' : 'NO');
+            
+            $_SESSION['error'] = $error_msg;
+            closeConnection($conn);
+            
+            if (isset($_GET['modal'])) {
+                ob_clean();
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $error_msg]);
+                exit;
+            }
+            
+            header('Location: input_medicine.php' . ($action == 'update' ? '?id=' . ($_POST['medicine_id'] ?? '') : ''));
             exit;
         }
     }
     
     // ========== TAMBAH OBAT BARU ==========
     if ($action == 'add') {
-        // Generate medicine_id
-        $medicine_id = 'MED' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        // ✅ FIX: Generate medicine_id yang auto-increment
+        $get_last_id = $conn->query("SELECT medicine_id FROM medicines ORDER BY medicine_id DESC LIMIT 1");
         
-        // Check if ID already exists (loop until unique)
-        $check_stmt = $conn->prepare("SELECT medicine_id FROM medicines WHERE medicine_id = ?");
-        $check_stmt->bind_param("s", $medicine_id);
-        $check_stmt->execute();
-        while ($check_stmt->get_result()->num_rows > 0) {
-            $medicine_id = 'MED' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            $check_stmt->execute();
+        if ($get_last_id && $get_last_id->num_rows > 0) {
+            $last_row = $get_last_id->fetch_assoc();
+            $last_id = $last_row['medicine_id'];
+            
+            // Extract number from MED-XXX
+            $last_number = intval(substr($last_id, 4));
+            $new_number = $last_number + 1;
+            $medicine_id = 'MED-' . str_pad($new_number, 3, '0', STR_PAD_LEFT);
+        } else {
+            // Jika belum ada data, mulai dari MED-001
+            $medicine_id = 'MED-001';
         }
-        $check_stmt->close();
         
-        // ✅ INSERT dengan admin_id (VARCHAR)
+        // Check if gambar required for new entry
+        if (empty($gambar_path)) {
+            $error_msg = 'Gambar obat wajib diupload untuk obat baru!';
+            $_SESSION['error'] = $error_msg;
+            closeConnection($conn);
+            
+            if (isset($_GET['modal'])) {
+                ob_clean();
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $error_msg]);
+                exit;
+            }
+            
+            header('Location: input_medicine.php');
+            exit;
+        }
+        
+        // ✅ INSERT dengan admin_id
         $stmt = $conn->prepare("
             INSERT INTO medicines 
             (medicine_id, medicine_name, description, price, expired_date, supplier_id, stock, 
@@ -142,57 +265,88 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
-        // ✅ CEK PREPARE STATEMENT
         if ($stmt === false) {
-            $_SESSION['error'] = 'Database error: ' . htmlspecialchars($conn->error);
+            $error_msg = 'Database error: ' . htmlspecialchars($conn->error);
+            $_SESSION['error'] = $error_msg;
+            closeConnection($conn);
+            
+            if (isset($_GET['modal'])) {
+                ob_clean();
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $error_msg]);
+                exit;
+            }
+            
             header('Location: input_medicine.php');
             exit;
         }
         
-        // ✅ FIX: Urutan type harus: s s s d s s i s s s s s s
-        //         medicine_id, nama, desc, price, expired, supplier, stock, image, cat, ben, dos, warn, admin
         $stmt->bind_param(
             "sssdssissssss", 
-            $medicine_id,    // s - medicine_id (VARCHAR)
-            $nama_obat,      // s - medicine_name (VARCHAR)
-            $deskripsi,      // s - description (TEXT)
-            $harga,          // d - price (DECIMAL)
-            $expired,        // s - expired_date (DATE)
-            $id_supplier,    // s - supplier_id (VARCHAR)
-            $quantity,       // i - stock (INT)
-            $gambar_path,    // s - image_path (VARCHAR)
-            $category,       // s - category (ENUM)
-            $benefits,       // s - benefits (TEXT)
-            $dosage,         // s - dosage (TEXT)
-            $warnings,       // s - warnings (TEXT)
-            $admin_id        // s - admin_id (VARCHAR)
+            $medicine_id,
+            $nama_obat,
+            $deskripsi,
+            $harga,
+            $expired,
+            $id_supplier,
+            $quantity,
+            $gambar_path,
+            $category,
+            $benefits,
+            $dosage,
+            $warnings,
+            $admin_id
         );
         
         if ($stmt->execute()) {
-            $_SESSION['success'] = "Obat {$nama_obat} berhasil ditambahkan oleh {$admin_username}!";
+            $success_msg = "Obat {$nama_obat} berhasil ditambahkan dengan ID {$medicine_id}!";
+            $_SESSION['success'] = $success_msg;
+            $stmt->close();
+            closeConnection($conn);
             
-            // Close modal jika dipanggil dari modal
+            // ✅ FIX: Return JSON for modal to handle closure
             if (isset($_GET['modal'])) {
-                echo "<script>window.parent.postMessage('closeModal', '*');</script>";
+                ob_clean(); // ✅ BERSIHKAN BUFFER
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => $success_msg]);
                 exit;
             }
             
             header('Location: stock_medicine.php');
             exit;
         } else {
-            $_SESSION['error'] = 'Gagal menambahkan obat: ' . $stmt->error;
+            $error_msg = 'Gagal menambahkan obat: ' . $stmt->error;
+            $_SESSION['error'] = $error_msg;
+            $stmt->close();
+            closeConnection($conn);
+            
+            if (isset($_GET['modal'])) {
+                ob_clean();
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $error_msg]);
+                exit;
+            }
+            
             header('Location: input_medicine.php');
             exit;
         }
-        
-        $stmt->close();
     } 
     // ========== UPDATE OBAT ==========
     else if ($action == 'update') {
         $medicine_id = trim($_POST['medicine_id'] ?? '');
         
         if (empty($medicine_id)) {
-            $_SESSION['error'] = 'ID obat tidak valid!';
+            $error_msg = 'ID obat tidak valid!';
+            $_SESSION['error'] = $error_msg;
+            closeConnection($conn);
+            
+            if (isset($_GET['modal'])) {
+                ob_clean();
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $error_msg]);
+                exit;
+            }
+            
             header('Location: stock_medicine.php');
             exit;
         }
@@ -208,21 +362,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
             $current_stmt->close();
         } else {
-            // Delete old image if new one uploaded
+            // Delete old image if new one uploaded (with error suppression)
             $old_stmt = $conn->prepare("SELECT image_path FROM medicines WHERE medicine_id = ?");
             $old_stmt->bind_param("s", $medicine_id);
             $old_stmt->execute();
             $old_result = $old_stmt->get_result();
             if ($old_row = $old_result->fetch_assoc()) {
                 $old_image = $old_row['image_path'];
-                if (!empty($old_image) && file_exists("../../" . $old_image)) {
-                    unlink("../../" . $old_image);
+                if (!empty($old_image)) {
+                    $project_root = dirname(dirname(__DIR__));
+                    $old_full_path = $project_root . '/' . $old_image;
+                    if (file_exists($old_full_path)) {
+                        @unlink($old_full_path);
+                    }
                 }
             }
             $old_stmt->close();
         }
         
-        // ✅ UPDATE dengan expired_date
         $stmt = $conn->prepare("
             UPDATE medicines 
             SET medicine_name = ?, 
@@ -239,9 +396,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             WHERE medicine_id = ?
         ");
         
-        // ✅ CEK PREPARE STATEMENT
         if ($stmt === false) {
-            $_SESSION['error'] = 'Database error: ' . htmlspecialchars($conn->error);
+            $error_msg = 'Database error: ' . htmlspecialchars($conn->error);
+            $_SESSION['error'] = $error_msg;
+            closeConnection($conn);
+            
+            if (isset($_GET['modal'])) {
+                ob_clean();
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $error_msg]);
+                exit;
+            }
+            
             header('Location: input_medicine.php?id=' . $medicine_id);
             exit;
         }
@@ -254,27 +420,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         );
         
         if ($stmt->execute()) {
-            $_SESSION['success'] = "Obat {$nama_obat} berhasil diupdate oleh {$admin_username}!";
+            $success_msg = "Obat {$nama_obat} berhasil diupdate!";
+            $_SESSION['success'] = $success_msg;
+            $stmt->close();
+            closeConnection($conn);
             
-            // Close modal jika dipanggil dari modal
+            // ✅ FIX: Return JSON for modal
             if (isset($_GET['modal'])) {
-                echo "<script>window.parent.postMessage('closeModal', '*');</script>";
+                ob_clean(); // ✅ BERSIHKAN BUFFER
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => $success_msg]);
                 exit;
             }
             
             header('Location: stock_medicine.php');
             exit;
         } else {
-            $_SESSION['error'] = 'Gagal mengupdate obat: ' . $stmt->error;
+            $error_msg = 'Gagal mengupdate obat: ' . $stmt->error;
+            $_SESSION['error'] = $error_msg;
+            $stmt->close();
+            closeConnection($conn);
+            
+            if (isset($_GET['modal'])) {
+                ob_clean();
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $error_msg]);
+                exit;
+            }
+            
             header('Location: input_medicine.php?id=' . $medicine_id);
             exit;
         }
-        
-        $stmt->close();
     }
     
 } else {
     $_SESSION['error'] = 'Invalid request method';
+    closeConnection($conn);
     header('Location: stock_medicine.php');
     exit;
 }

@@ -1,8 +1,17 @@
 <?php
 session_start();
 require_once '../../Connection/connect.php';
-
+//process user
 header('Content-Type: text/plain');
+
+// UBAH INI - Panggil fungsi getConnection()
+$conn = getConnection();
+
+// Pengecekan koneksi
+if (!$conn) {
+    echo 'error|Koneksi database gagal';
+    exit;
+}
 
 $action = $_POST['action'] ?? '';
 
@@ -82,4 +91,7 @@ function listUsers() {
     
     if(isset($stmt)) $stmt->close();
 }
+
+// TAMBAHKAN DI AKHIR FILE - Tutup koneksi
+closeConnection($conn);
 ?>

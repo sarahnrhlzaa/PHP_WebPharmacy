@@ -9,7 +9,6 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-include 'navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -21,6 +20,7 @@ include 'navbar.php';
     <link rel="stylesheet" href="../cssadmin/supplier.css">
 </head>
 <body>
+    <?php include 'navbar.php';?>
     <div class="container">
         <h1 class="page-title">Data Supplier</h1>
         

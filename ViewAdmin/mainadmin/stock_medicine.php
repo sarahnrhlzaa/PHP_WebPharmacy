@@ -1,5 +1,5 @@
-<?php
-// session_start();
+<?php 
+session_start();
 require_once '../../Connection/connect.php';
 $conn = getConnection(); // TAMBAHKAN INI - panggil fungsi untuk dapat koneksi
 
@@ -15,8 +15,6 @@ $query = "SELECT m.*, s.company_name as supplier_name
           LEFT JOIN suppliers s ON m.supplier_id = s.supplier_id 
           ORDER BY m.medicine_name ASC";
 $result = $conn->query($query);
-
-include 'navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -28,6 +26,8 @@ include 'navbar.php';
     <title>Stock Medicine-PharmaCare</title>
 </head>
 <body>
+    <?php include 'navbar.php';?>
+
     <div class="container">
         <div class="title-stock">
             <h1>📦 Stock Medicine</h1>

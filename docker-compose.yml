@@ -3,11 +3,14 @@ services:
   # 1. Service Nginx (BARU - Pengganti Apache)
   # Ini adalah "resepsionis" web server-mu
   nginx:
-    image: nginx:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile.nginx
+    # image: nginx:latest
     ports:
       - "8080:80" # Kita tetap pakai port 8080-mu
     volumes:
-      - .:/var/www/html # Menyambungkan folder kodemu
+      - .:/var/www/myphpapp # Menyambungkan folder kodemu
       - ./default.conf:/etc/nginx/conf.d/default.conf # Menyambungkan file config Nginx
     depends_on:
       - php
@@ -20,16 +23,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile # Akan membaca Dockerfile (FPM) baru
-    working_dir: /var/www/html # Path kodemu
+    working_dir: /var/www/myphpapp # Path kodemu
     volumes:
-      - .:/var/www/html
+      - .:/var/www/myphpapp
     depends_on:
       - mysql
     environment: # Kredensial DB-mu (ini sama dari proyekmu)
-      - DB_HOST=mysql
-      - DB_NAME=webpharmacy
-      - DB_USER=appuser
-      - DB_PASSWORD=password
+      DB_HOST: mysql
+      DB_NAME: webpharmacy
+      DB_USER: appuser
+      DB_PASSWORD: password
     networks:
       - app-network
 
@@ -55,8 +58,8 @@ services:
     ports:
       - "8081:80"
     environment:
-      - PMA_HOST=mysql
-      - MYSQL_ROOT_PASSWORD=password
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: password
     depends_on:
       - mysql
     networks:
