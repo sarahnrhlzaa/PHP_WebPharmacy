@@ -2,12 +2,12 @@
 session_start();
 
 // Include koneksi database - sesuaikan path
-if (file_exists(__DIR__ . '/../connection/connect.php')) {
-    include __DIR__ . '/../connection/connect.php';
-} elseif (file_exists(__DIR__ . '/../../connection/connect.php')) {
-    include __DIR__ . '/../../connection/connect.php';
-} elseif (file_exists($_SERVER['DOCUMENT_ROOT'] . '/project2_q1/connection/connect.php')) {
-    include $_SERVER['DOCUMENT_ROOT'] . '/project2_q1/connection/connect.php';
+if (file_exists(__DIR__ . '/../Connection/connect.php')) {
+    include __DIR__ . '/../Connection/connect.php';
+} elseif (file_exists(__DIR__ . '/../../Connection/connect.php')) {
+    include __DIR__ . '/../../Connection/connect.php';
+} elseif (file_exists($_SERVER['DOCUMENT_ROOT'] . '/PHP_WebPharmacy/Connection/connect.php')) {
+    include $_SERVER['DOCUMENT_ROOT'] . '/PHP_WebPharmacy/Connection/connect.php';
 } else {
     die("Error: File connect.php tidak ditemukan!");
 }

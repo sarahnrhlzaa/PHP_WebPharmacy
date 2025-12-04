@@ -3,7 +3,8 @@ session_start();
 require_once '../../Connection/connect.php';
 $conn = getConnection();
 
-if (!isset($_SESSION['username'])) {
+// PERBAIKAN: Cek admin_id, bukan username
+if (!isset($_SESSION['admin_id'])) {
     header('Location: login.php');
     exit();
 }
@@ -251,17 +252,6 @@ include 'navbar.php';
                 }
                 ?>
             </div>
-        </div>
-
-        <!-- Chart Transaction -->
-        <div class="card">
-            <div class="card-header">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                </svg>
-                <h3>Transaction Chart (Weekly)</h3>
-            </div>
-            <canvas id="transactionChart"></canvas>
         </div>
 
         <!-- Recent Transactions -->

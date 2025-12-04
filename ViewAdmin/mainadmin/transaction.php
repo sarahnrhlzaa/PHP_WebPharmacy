@@ -3,18 +3,18 @@
 session_start();
 require_once '../../Connection/connect.php';
 
-// Pakai getConnection() yang return mysqli
 $conn = getConnection();
 
-// Query untuk mengambil semua transaksi (orders dan purchases)
+// PERBAIKAN QUERY: 
+// Tambahkan fallback ke o.user_name dan o.user_email jika data user (u) tidak ditemukan (manual order)
 $query = "
     SELECT 
         'order' as transaction_type,
         o.order_id as transaction_id,
         o.order_id as reference_number,
-        COALESCE(u.full_name, u.username, 'N/A') as party_name,
-        COALESCE(u.email, 'N/A') as contact,
-        COALESCE(u.phone_number, '-') as phone,
+        COALESCE(u.full_name, o.user_name, 'N/A') as party_name,
+        COALESCE(u.email, o.user_email, 'N/A') as contact,
+        COALESCE(u.phone_number, o.user_phone, '-') as phone,
         o.total_amount,
         o.payment_method,
         o.status,
@@ -50,12 +50,10 @@ if (!$result) {
     die("Query Error: " . $conn->error);
 }
 
-// Fetch semua data ke array
 $transactions = [];
 while ($row = $result->fetch_assoc()) {
     $transactions[] = $row;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -80,72 +78,8 @@ while ($row = $result->fetch_assoc()) {
                 </div>
             </div>
 
-            <?php
-            // Hitung statistik
-            $total_orders = 0;
-            $total_purchases = 0;
-            $total_revenue = 0;
-            $total_spending = 0;
-
-            foreach ($transactions as $t) {
-                if ($t['transaction_type'] == 'order') {
-                    $total_orders++;
-                    $total_revenue += $t['total_amount'];
-                } else {
-                    $total_purchases++;
-                    $total_spending += $t['total_amount'];
-                }
-            }
-            ?>
-
-            <div class="stats-row">
-                <div class="stat-card blue">
-                    <div class="stat-label">Total Orders</div>
-                    <div class="stat-value"><?php echo $total_orders; ?></div>
-                </div>
-                <div class="stat-card green">
-                    <div class="stat-label">Total Revenue</div>
-                    <div class="stat-value">Rp <?php echo number_format($total_revenue, 0, ',', '.'); ?></div>
-                </div>
-                <div class="stat-card orange">
-                    <div class="stat-label">Total Purchases</div>
-                    <div class="stat-value"><?php echo $total_purchases; ?></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Spending</div>
-                    <div class="stat-value">Rp <?php echo number_format($total_spending, 0, ',', '.'); ?></div>
-                </div>
-            </div>
-
-            <div class="filters">
-                <div class="filter-group">
-                    <label>Tipe Transaksi</label>
-                    <select id="filterType" onchange="filterTable()">
-                        <option value="all">Semua</option>
-                        <option value="order">Order</option>
-                        <option value="purchase">Purchase</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Status</label>
-                    <select id="filterStatus" onchange="filterTable()">
-                        <option value="all">Semua</option>
-                        <option value="completed">Completed</option>
-                        <option value="pending">Pending</option>
-                        <option value="received">Received</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Cari</label>
-                    <input type="text" id="searchInput" placeholder="Cari transaksi..." onkeyup="filterTable()">
-                </div>
-            </div>
-
             <?php if (empty($transactions)): ?>
                 <div class="empty-state">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
                     <h3>Belum ada transaksi</h3>
                     <p>Mulai dengan menambahkan order atau purchase baru</p>
                 </div>
@@ -197,11 +131,7 @@ while ($row = $result->fetch_assoc()) {
             <?php endif; ?>
         </div>
     </div>
-    
     <script src="../jsadmin/transaction.js"></script>
-    
-    <?php
-    closeConnection($conn);
-    ?>
+    <?php closeConnection($conn); ?>
 </body>
 </html>

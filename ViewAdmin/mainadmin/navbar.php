@@ -9,11 +9,16 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin User';
-
-// ✅ TAMBAH INI - Detect halaman aktif
+// PERBAIKAN: Ambil dari 'admin_username'
+$adminName = $_SESSION['admin_username'] ?? 'Admin';
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
+
+<!-- $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin User'; -->
+
+<!-- // ✅ TAMBAH INI - Detect halaman aktif
+$current_page = basename($_SERVER['PHP_SELF']);
+?> -->
 
 <!-- ✅ CSS di sini biar konsisten -->
 <link rel="stylesheet" href="../cssadmin/navbar.css">
@@ -105,7 +110,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <circle cx="12" cy="7" r="4"/>
                     </svg>
                 </div>
-                <span class="username"><?php echo htmlspecialchars($username); ?></span>
+                <span class="admin_username"><?php echo htmlspecialchars($adminName); ?></span>
                 <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="6 9 12 15 18 9"/>
                 </svg>

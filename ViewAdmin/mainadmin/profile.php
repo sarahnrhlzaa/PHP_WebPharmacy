@@ -13,7 +13,7 @@ if (empty($_SESSION['admin_id'])) {
 }
 
 $admin_id = $_SESSION['admin_id'];
-$username = $_SESSION['username'] ?? 'Admin';
+$username = $_SESSION['admin_username'] ?? 'Admin';
 
 $conn = getConnection();
 

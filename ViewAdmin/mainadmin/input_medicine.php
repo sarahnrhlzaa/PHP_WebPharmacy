@@ -9,7 +9,7 @@ if (!isset($_SESSION['admin_id'])) {
 
 // ✅ AMBIL INFO ADMIN DARI SESSION
 $admin_id = $_SESSION['admin_id'];
-$admin_username = $_SESSION['username'];
+$admin_username = $_SESSION['admin_username'] ?? 'Admin';
 
 // Koneksi database
 require_once '../../Connection/connect.php';
