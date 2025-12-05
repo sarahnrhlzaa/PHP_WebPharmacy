@@ -139,7 +139,7 @@ function getImagePath($image_path) {
             <div class="detail-box">
                 <div class="type">
                     <a href="#"><?php echo htmlspecialchars($product['medicine_name']); ?></a>
-                    <span><?php echo htmlspecialchars($product['tag']); ?></span>
+                    <span><?php echo htmlspecialchars($product['tag'] ?? ''); ?></span>
                 </div>
                 <a href="#" class="price"><?php echo formatPrice($product['price']); ?></a>
             </div>

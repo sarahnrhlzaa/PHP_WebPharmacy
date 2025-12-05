@@ -125,9 +125,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
             // Kita tambahkan kolom full_name dan isi dengan string kosong ""
 $default_fullname = ""; 
 
-$stmt = $conn->prepare("INSERT INTO users (user_id, username, email, password, full_name, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
-// Perhatikan 'sssss' (tambah satu 's') dan variabel $default_fullname
-$stmt->bind_param('sssss', $new_id, $username, $email, $password_hash, $default_fullname);
+// $stmt = $conn->prepare("INSERT INTO users (user_id, username, email, password, full_name, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+// // Perhatikan 'sssss' (tambah satu 's') dan variabel $default_fullname
+// $stmt->bind_param('sssss', $new_id, $username, $email, $password_hash, $default_fullname);
+
+// Query yang BARU (Solusi)
+// Kita isi kolom wajib lainnya dengan string kosong atau nilai default sementara
+$stmt = $conn->prepare("INSERT INTO users (
+    user_id, username, email, password, full_name, 
+    phone_number, birth_date, gender, city, province, address, 
+    created_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+
+// Data dummy sementara
+$dummy_phone = "";
+$dummy_birth = "2000-01-01"; // Format date wajib YYYY-MM-DD
+$dummy_gender = "Laki-laki"; // Harus sesuai ENUM di database ('Laki-laki' atau 'Perempuan')
+$dummy_city = "";
+$dummy_province = "";
+$dummy_address = "";
+
+// Perhatikan jumlah 's' di parameter pertama harus sama dengan jumlah variabel (11 variabel string)
+$stmt->bind_param(
+    'sssssssssss', 
+    $new_id, 
+    $username, 
+    $email, 
+    $password_hash, 
+    $default_fullname,
+    $dummy_phone,
+    $dummy_birth,
+    $dummy_gender,
+    $dummy_city,
+    $dummy_province,
+    $dummy_address
+);
 
             if ($stmt->execute()) {
                 // Set session setelah berhasil register

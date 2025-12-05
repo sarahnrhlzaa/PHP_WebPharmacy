@@ -145,7 +145,7 @@ $result_supplier = $conn->query($query_supplier);
             <?php endif; ?>
 
             <div class="form-card">
-                <<form method="POST" 
+                <form method="POST" 
                         action="process_medicine.php?action=<?php echo $edit_mode ? 'update' : 'add'; ?><?php echo isset($_GET['modal']) ? '&modal=1' : ''; ?>" 
                         enctype="multipart/form-data" 
                         id="medicineForm">
