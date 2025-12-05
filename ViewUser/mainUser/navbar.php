@@ -4,19 +4,10 @@ $isLoggedIn = !empty($_SESSION['user_id']);
 $username  = $isLoggedIn ? ($_SESSION['username'] ?? '') : '';
 ?>
 
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../cssuser/navbar.css">
     <link href="https://fonts.googleapis.com/css2?family=Andika:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <title>Navbar</title>
-</head>
-<body>
-    <!-- header -->
+
 <header class = "header">
 
     <a class ="logo">
@@ -86,5 +77,3 @@ $username  = $isLoggedIn ? ($_SESSION['username'] ?? '') : '';
 </header>
 
 <script src="../jsUser/navbar.js"></script>
-</body>
-</html>

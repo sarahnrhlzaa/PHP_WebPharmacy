@@ -8,7 +8,7 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <link rel="stylesheet" href="../cssUser/navbar.css"> -->
-    <link rel="stylesheet" href="../cssUser/outlet.css">
+    <link rel="stylesheet" href="../cssuser/outlet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Our Outlets - PharmaCare</title>
 </head>
