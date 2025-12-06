@@ -24,11 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $res = $stmt->get_result();
 
         if ($row = $res->fetch_assoc()) {
-            // Cek Password (Plain text sesuai database Anda)
-            if ($password === $row['password']) {
+            // ✅ PERBAIKAN: Gunakan password_verify() untuk bcrypt
+            if (password_verify($password, $row['password'])) {
                 $_SESSION['admin_id']  = $row['admin_id'];
-                
-                // PERBAIKAN UTAMA DI SINI: Gunakan 'admin_username'
                 $_SESSION['admin_username']  = $row['username'];
                 
                 header("Location: index.php");
