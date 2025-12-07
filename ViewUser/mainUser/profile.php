@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// 1. Cek Login
 if (empty($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
@@ -14,28 +13,25 @@ $user_id = $_SESSION['user_id'];
 $message = '';
 $messageType = '';
 
-// 2. PROSES UPDATE DATA (Jika tombol Save ditekan)
+// PROSES UPDATE DATA
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
-    $p_fullname = $_POST['fullname'] ?? '';
-    $p_phone    = $_POST['phone'] ?? '';
-    $p_birth    = $_POST['birth'] ?? '';
-    $p_gender   = $_POST['gender'] ?? '';
-    $p_city     = $_POST['city'] ?? '';
-    $p_province = $_POST['province'] ?? '';
-    $p_address  = $_POST['address'] ?? '';
+    $p_fullname = trim($_POST['fullname'] ?? '');
+    $p_phone    = trim($_POST['phone'] ?? '');
+    $p_birth    = trim($_POST['birth'] ?? '');
+    $p_gender   = trim($_POST['gender'] ?? '');
+    $p_city     = trim($_POST['city'] ?? '');
+    $p_province = trim($_POST['province'] ?? '');
+    $p_address  = trim($_POST['address'] ?? '');
 
-    // Query Update (Sesuaikan nama kolom dengan webpharmacy.sql)
     $stmt = $conn->prepare("UPDATE users SET full_name = ?, phone_number = ?, birth_date = ?, gender = ?, city = ?, province = ?, address = ? WHERE user_id = ?");
     
-    // Perhatikan urutan parameter binding
     $stmt->bind_param('ssssssss', $p_fullname, $p_phone, $p_birth, $p_gender, $p_city, $p_province, $p_address, $user_id);
 
     if ($stmt->execute()) {
         $message = "Profil berhasil diperbarui!";
         $messageType = "success";
         
-        // Update session jika perlu (opsional)
-        $_SESSION['full_name'] = $p_fullname;
+        $_SESSION['user_full_name'] = $p_fullname;
     } else {
         $message = "Gagal memperbarui profil: " . $conn->error;
         $messageType = "error";
@@ -43,8 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     $stmt->close();
 }
 
-// 3. AMBIL DATA TERBARU DARI DATABASE (SELECT)
-// Ini wajib dilakukan agar form terisi data yang benar saat halaman dibuka
+// AMBIL DATA TERBARU DARI DATABASE
 $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
@@ -53,22 +48,20 @@ $userData = $result->fetch_assoc();
 $stmt->close();
 closeConnection($conn);
 
-// Jika user tidak ditemukan (kasus langka)
 if (!$userData) {
     echo "User data not found.";
     exit();
 }
 
-// Mapping data database ke variabel untuk HTML value
 $username = $userData['username'];
 $email    = $userData['email'];
-$fullname = $userData['full_name'];     // Sesuai kolom DB: full_name
-$phone    = $userData['phone_number'];  // Sesuai kolom DB: phone_number
-$birth    = $userData['birth_date'];    // Sesuai kolom DB: birth_date
-$gender   = $userData['gender'];
-$city     = $userData['city'];
-$province = $userData['province'];
-$address  = $userData['address'];
+$fullname = $userData['full_name'] ?? '';
+$phone    = $userData['phone_number'] ?? '';
+$birth    = $userData['birth_date'] ?? '';
+$gender   = $userData['gender'] ?? '';
+$city     = $userData['city'] ?? '';
+$province = $userData['province'] ?? '';
+$address  = $userData['address'] ?? '';
 ?>
 
 <!DOCTYPE html>
@@ -80,7 +73,6 @@ $address  = $userData['address'];
   <link rel="stylesheet" href="../cssuser/profile.css">
   <title>User Profile</title>
   <style>
-      /* CSS Tambahan untuk Notifikasi */
       .alert {
           padding: 15px;
           margin-bottom: 20px;
@@ -172,7 +164,6 @@ $address  = $userData['address'];
 <script src="../jsUser/profile.js"></script>
 
 <script>
-// Sedikit tweak JS inline untuk memastikan tombol cancel mengembalikan value awal jika batal edit
 document.addEventListener('DOMContentLoaded', function() {
     const originalValues = {
         fullname: "<?= htmlspecialchars($fullname) ?>",
@@ -181,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gender: "<?= htmlspecialchars($gender) ?>",
         city: "<?= htmlspecialchars($city) ?>",
         province: "<?= htmlspecialchars($province) ?>",
-        address: `<?= $address ?>` // pakai backtick untuk handle newline di address
+        address: `<?= str_replace(["\r", "\n"], '', addslashes($address)) ?>`
     };
 
     document.getElementById('cancelBtn').addEventListener('click', function() {

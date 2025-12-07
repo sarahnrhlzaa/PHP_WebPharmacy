@@ -13,53 +13,19 @@ if (signUpButton && signInButton && container) {
 }
 
 
-function togglePasswordSignup(){
-    let passwordField = document.querySelector('.sign-up-container input[name="password"]');
-    if (passwordField.type === "password"){
-        passwordField.type = "text";
-    } else{
-        passwordField.type = "password";
+function togglePassword(inputId, icon) {
+      const input = document.getElementById(inputId);
+      const iconElement = icon.querySelector('i');
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        iconElement.classList.remove('fa-eye');
+        iconElement.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        iconElement.classList.remove('fa-eye-slash');
+        iconElement.classList.add('fa-eye');
+      }
     }
-}
-
-function togglePasswordSignin(){
-    let passwordField = document.querySelector('.sign-in-container input[name="password"]');
-    if (passwordField.type === "password"){
-        passwordField.type = "text";
-    } else{
-        passwordField.type = "password";
-    }
-}
 
 
-
-// document.getElementById('loginForm').addEventListener('submit', function(e) {
-//   const username = document.getElementById('username').value.trim();
-//   const password = document.getElementById('password').value.trim();
-//   const userError = document.getElementById('userError');
-//   const passError = document.getElementById('passError');
-//   let valid = true;
-
-//   // Reset pesan error dulu
-//   userError.style.display = 'none';
-//   passError.style.display = 'none';
-
-//   // Validasi username kosong
-//   if (username === "") {
-//     userError.textContent = "⚠️ Username cannot be empty!";
-//     userError.style.display = 'block';
-//     valid = false;
-//   }
-
-//   // Validasi password kosong
-//   if (password === "") {
-//     passError.textContent = "⚠️ Password cannot be empty!";
-//     passError.style.display = 'block';
-//     valid = false;
-//   }
-
-//   // Kalau ada yang kosong, cegah form dikirim
-//   if (!valid) {
-//     e.preventDefault();
-//   }
-// });

@@ -1,7 +1,8 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
 $isLoggedIn = !empty($_SESSION['user_id']);
-$username  = $isLoggedIn ? ($_SESSION['username'] ?? '') : '';
+$username  = $isLoggedIn ? ($_SESSION['user_username'] ?? 'User') : '';
 ?>
 
     <link rel="stylesheet" href="../cssuser/navbar.css">
@@ -39,18 +40,11 @@ $username  = $isLoggedIn ? ($_SESSION['username'] ?? '') : '';
         </form>
     </div>
 
-            <!-- <div id="search-bar" class="search-bar">
-                <input type="text" id="searchInput" placeholder="Search..." />
-                <button id="searchBtn">Search</button>
-            </div>
-    </div> -->
-
         <a href="history.php" title="History">
             <i class="fa-solid fa-clock-rotate-left"></i>
         </a>
         <a href="cart.php" title="Keranjang">
             <i class="fa-solid fa-cart-shopping"></i>
-            <!-- <span class="cart-badge" style="display: none;">0</span> -->
         </a>
 
         <!-- PROFILE + NAMA USER -->

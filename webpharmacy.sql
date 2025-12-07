@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Waktu pembuatan: 06 Des 2025 pada 07.49
+-- Waktu pembuatan: 07 Des 2025 pada 09.09
 -- Versi server: 8.0.44
 -- Versi PHP: 8.3.26
 
@@ -274,14 +274,14 @@ CREATE TABLE `users` (
   `user_id` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
   `username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `full_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `full_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `phone_number` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
-  `birth_date` date NOT NULL,
-  `gender` enum('Laki-laki','Perempuan') COLLATE utf8mb4_general_ci NOT NULL,
-  `city` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `province` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `address` text COLLATE utf8mb4_general_ci NOT NULL,
+  `phone_number` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `birth_date` date DEFAULT NULL,
+  `gender` enum('Laki-laki','Perempuan') COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `city` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `province` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `address` text COLLATE utf8mb4_general_ci,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -291,17 +291,17 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `full_name`, `email`, `phone_number`, `birth_date`, `gender`, `city`, `province`, `address`, `created_at`, `updated_at`) VALUES
-('CUS001', 'johndoe', 'john123', 'John Doe', 'john.doe@gmail.com', '081234567890', '1995-05-15', 'Laki-laki', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Sudirman No. 123, Kebayoran Baru', '2025-10-18 09:01:41', '2025-10-18 11:00:39'),
-('CUS002', 'putribunga', 'putri123', 'putri bunga lestari', 'putri.bunga@gmail.com', '089898989', '2000-01-01', 'Perempuan', 'Bandung', 'Jawa Barat', 'Jl. Braga', '2025-10-18 09:01:41', '2025-10-19 23:20:18'),
-('CUS003', 'ahmadrifai', 'ahmad123', 'Ahmad Rifai', 'ahmad.rifai@gmail.com', '082145678901', '1992-03-10', 'Laki-laki', 'Surabaya', 'Jawa Timur', 'Jl. Diponegoro No. 78, Gubeng', '2025-10-18 09:01:41', '2025-10-18 11:01:46'),
-('CUS004', 'sitinurhayati', 'siti123', 'Siti Nurhayati', 'siti.nurh@gmail.com', '085678901234', '1999-12-25', 'Perempuan', 'Yogyakarta', 'DI Yogyakarta', 'Jl. Malioboro No. 234, Gedongtengen', '2025-10-18 09:01:41', '2025-10-18 11:01:58'),
-('CUS005', 'budiwijaya', 'budi123', 'Budi Wijaya', 'budi.wijaya88@gmail.com', '087712345678', '1988-07-08', 'Laki-laki', 'Semarang', 'Jawa Tengah', 'Jl. Pandanaran No. 156, Semarang Tengah', '2025-10-18 09:01:41', '2025-10-18 11:02:09'),
-('CUS006', 'janesmith', 'jane123\r\n', 'Jane Smith', 'jane.smith@email.com', '0856-7890-1234', '1992-03-20', 'Perempuan', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Thamrin No. 45, Jakarta Selatan', '2025-10-19 13:55:03', '2025-10-19 13:55:36'),
-('CUS007', 'ahmadwijaya', 'ahmad123\r\n', 'Ahmad Wijaya', 'ahmad.w@email.com', '0821-5555-6666', '1988-07-10', 'Laki-laki', 'Jakarta Barat', 'DKI Jakarta', 'Jl. Gatot Subroto No. 88, Jakarta Barat', '2025-10-19 13:55:03', '2025-10-19 13:56:02'),
-('CUS008', 'sitinurhaliza', 'liza123\r\n\r\n', 'Siti Nurhaliza', 'siti.n@email.com', '0877-2222-3333', '1995-05-25', 'Perempuan', 'Jakarta Pusat', 'DKI Jakarta', 'Jl. MH Thamrin No. 10, Jakarta Pusat', '2025-10-19 13:55:03', '2025-10-19 14:05:40'),
-('CUS009', 'budisantoso', 'santoso123', 'Budi Santoso', 'budi.s@email.com', '0813-9999-8888', '1985-11-30', 'Laki-laki', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Kuningan No. 55, Jakarta Selatan', '2025-10-19 13:55:03', '2025-10-19 13:57:13'),
-('CUS010', 'dewilestari', 'lestari123\r\n', 'Dewi Lestari', 'dewi.l@email.com', '0898-7777-6666', '1993-09-12', 'Perempuan', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Rasuna Said No. 12, Jakarta Selatan', '2025-10-19 13:55:03', '2025-10-19 13:57:30'),
-('CUS011', 'rinasusanti', 'rina123\r\n', 'Rina Susanti', 'rina.s@email.com', '0822-4444-5555', '1991-02-18', 'Perempuan', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Senopati No. 77, Jakarta Selatan', '2025-10-19 13:55:03', '2025-10-19 13:57:46');
+('CUS001', 'johndoe', '$2y$10$QrykgROA.KsLyjJXwSX8/OW5xFxA8an0OYexRLCfrlrZo08KLfbhK', 'John Doe', 'john.doe@gmail.com', '081234567890', '1995-05-15', 'Laki-laki', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Sudirman No. 123, Kebayoran Baru', '2025-10-18 09:01:41', '2025-12-07 08:49:47'),
+('CUS002', 'putribunga', '$2y$10$cZdLd58IQlwaUtdg54fqKOp9qDPCLujy1B3BYrp/Ld6UIkKVUcA7i', 'putri bunga lestari', 'putri.bunga@gmail.com', '089898989', '2000-01-01', 'Perempuan', 'Bandung', 'Jawa Barat', 'Jl. Braga', '2025-10-18 09:01:41', '2025-12-07 08:49:47'),
+('CUS003', 'ahmadrifai', '$2y$10$UwM9u2epB.fvfoE2Qto0xuPDIfuszGv6aSvV0sMNfnJm7Js55lmaa', 'Ahmad Rifai', 'ahmad.rifai@gmail.com', '082145678901', '1992-03-10', 'Laki-laki', 'Surabaya', 'Jawa Timur', 'Jl. Diponegoro No. 78, Gubeng', '2025-10-18 09:01:41', '2025-12-07 08:49:47'),
+('CUS004', 'sitinurhayati', '$2y$10$oL0PVj9R9nxukuxPUYssmuAdroqdrpspmIvqQlePI9/MJa6pRlGTO', 'Siti Nurhayati', 'siti.nurh@gmail.com', '085678901234', '1999-12-25', 'Perempuan', 'Yogyakarta', 'DI Yogyakarta', 'Jl. Malioboro No. 234, Gedongtengen', '2025-10-18 09:01:41', '2025-12-07 08:49:47'),
+('CUS005', 'budiwijaya', '$2y$10$OUGn4zauFd6GdEJ34ZnWYOKmpH5MOfxjH8H7cPknntEzb2BihQd2e', 'Budi Wijaya', 'budi.wijaya88@gmail.com', '087712345678', '1988-07-08', 'Laki-laki', 'Semarang', 'Jawa Tengah', 'Jl. Pandanaran No. 156, Semarang Tengah', '2025-10-18 09:01:41', '2025-12-07 08:49:47'),
+('CUS006', 'janesmith', '$2y$10$3nG1vxobIH0G06MQMkBHeesX3b4OeCQ7Dyi88iXnz.h4r175fwECm', 'Jane Smith', 'jane.smith@email.com', '0856-7890-1234', '1992-03-20', 'Perempuan', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Thamrin No. 45, Jakarta Selatan', '2025-10-19 13:55:03', '2025-12-07 08:49:47'),
+('CUS007', 'ahmadwijaya', '$2y$10$zYj6k/4BIzrN.Gh5sCPu3uZlppVUDhNMgX1F73KSUDJijIfJQI6E2', 'Ahmad Wijaya', 'ahmad.w@email.com', '0821-5555-6666', '1988-07-10', 'Laki-laki', 'Jakarta Barat', 'DKI Jakarta', 'Jl. Gatot Subroto No. 88, Jakarta Barat', '2025-10-19 13:55:03', '2025-12-07 08:49:48'),
+('CUS008', 'sitinurhaliza', '$2y$10$NOngAIfHiuNvFQByP9TqPuq7sp29SHcfNVMssvcR1DaG4zCkjlb8e', 'Siti Nurhaliza', 'siti.n@email.com', '0877-2222-3333', '1995-05-25', 'Perempuan', 'Jakarta Pusat', 'DKI Jakarta', 'Jl. MH Thamrin No. 10, Jakarta Pusat', '2025-10-19 13:55:03', '2025-12-07 08:49:48'),
+('CUS009', 'budisantoso', '$2y$10$rsWANldvCs9bPDqG6T307Oz2.z4J7sxGCNZRWvxxYWhiE72wqg2Ne', 'Budi Santoso', 'budi.s@email.com', '0813-9999-8888', '1985-11-30', 'Laki-laki', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Kuningan No. 55, Jakarta Selatan', '2025-10-19 13:55:03', '2025-12-07 08:49:48'),
+('CUS010', 'dewilestari', '$2y$10$Wce3U45v8UnNhzav3FiMRezHIMlprCh4w.mMjNjfb47e8BKwEG8iq', 'Dewi Lestari', 'dewi.l@email.com', '0898-7777-6666', '1993-09-12', 'Perempuan', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Rasuna Said No. 12, Jakarta Selatan', '2025-10-19 13:55:03', '2025-12-07 08:49:48'),
+('CUS011', 'rinasusanti', '$2y$10$bn9QPeGNeeEfUYhDnpiOEua1R5zrYP1z9w5Zm7Fjx00.HO3uXyXsO', 'Rina Susanti', 'rina.s@email.com', '0822-4444-5555', '1991-02-18', 'Perempuan', 'Jakarta Selatan', 'DKI Jakarta', 'Jl. Senopati No. 77, Jakarta Selatan', '2025-10-19 13:55:03', '2025-12-07 08:49:48');
 
 -- --------------------------------------------------------
 
@@ -310,20 +310,20 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `full_name`, `email`, `p
 -- (Lihat di bawah untuk tampilan aktual)
 --
 CREATE TABLE `vw_all_transactions` (
-`transaction_id` varchar(10)
-,`transaction_number` varchar(10)
-,`transaction_type` varchar(3)
-,`transaction_date` timestamp
+`admin_name` varchar(255)
+,`notes` mediumtext
+,`partner_address` mediumtext
+,`partner_email` varchar(255)
 ,`partner_id` varchar(10)
 ,`partner_name` varchar(255)
 ,`partner_phone` varchar(20)
-,`partner_email` varchar(255)
-,`partner_address` mediumtext
-,`notes` mediumtext
-,`total_amount` decimal(12,2)
 ,`payment_method` varchar(50)
 ,`status` varchar(10)
-,`admin_name` varchar(255)
+,`total_amount` decimal(12,2)
+,`transaction_date` timestamp
+,`transaction_id` varchar(10)
+,`transaction_number` varchar(10)
+,`transaction_type` varchar(3)
 );
 
 -- --------------------------------------------------------
@@ -334,13 +334,13 @@ CREATE TABLE `vw_all_transactions` (
 --
 CREATE TABLE `vw_transaction_details` (
 `detail_id` varchar(10)
-,`transaction_id` varchar(10)
-,`transaction_type` varchar(3)
 ,`medicine_id` varchar(20)
 ,`medicine_name` varchar(255)
-,`quantity` int
 ,`price` decimal(12,2)
+,`quantity` int
 ,`subtotal` decimal(12,2)
+,`transaction_id` varchar(10)
+,`transaction_type` varchar(3)
 );
 
 -- --------------------------------------------------------
@@ -350,11 +350,11 @@ CREATE TABLE `vw_transaction_details` (
 -- (Lihat di bawah untuk tampilan aktual)
 --
 CREATE TABLE `vw_transaction_summary` (
-`transaction_type` varchar(3)
+`month_year` varchar(7)
 ,`status` varchar(10)
-,`total_transactions` bigint
 ,`total_amount` decimal(34,2)
-,`month_year` varchar(7)
+,`total_transactions` bigint
+,`transaction_type` varchar(3)
 );
 
 --
